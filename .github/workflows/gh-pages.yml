@@ -1,8 +1,8 @@
-name: Deploy Hugo to Tencent Cloud via SFTP
+name: Deploy Hugo to Tencent Cloud via FTP  # 🔧 修改协议名称
 
 on:
   push:
-    branches: [ main ]  # 触发自动部署的分支
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -12,33 +12,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive  # 如果Hugo主题通过子模块引入，必须启用此选项
+          submodules: recursive
 
-      # 步骤2：安装指定版本的Hugo
+      # 步骤2：安装Hugo
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: "0.144.1"  # 替换为你实际使用的Hugo版本
-          extended: true  # 使用Hugo扩展版（支持Sass等）
+          hugo-version: "0.144.1"
+          extended: true
 
       # 步骤3：构建静态网站
       - name: Build Site
-        run: hugo --minify  # 生成优化后的静态文件到/public目录
+        run: hugo --minify
 
-      # 步骤4：安装SFTP依赖工具lftp
+      # 步骤4：安装lftp工具
       - name: Install lftp
-        run: sudo apt-get install -y lftp  # 安装SFTP客户端工具
+        run: sudo apt-get install -y lftp
 
-      # 步骤5：通过SFTP上传到服务器
-      - name: Upload Files via SFTP
+      # 步骤5：通过FTP上传到服务器（关键修改） 🔧
+      - name: Upload Files via FTP  # 步骤名称修改
         env:
-          FTP_USER: ${{ secrets.WINSCP_USER }}    # 从GitHub Secrets读取用户名
-          FTP_PASS: ${{ secrets.WINSCP_PASS }}    # 从GitHub Secrets读取密码
-          FTP_HOST: ${{ secrets.WINSCP_HOST }}    # SFTP服务器地址（如IP）
-          FTP_PORT: ${{ secrets.WINSCP_PORT }}    # SFTP端口（默认22）
-          FTP_PATH: "C:\\www\\wwwroot\\guige.host\\"     # 服务器目标目录
+          FTP_USER: ${{ secrets.WINSCP_USER }}
+          FTP_PASS: ${{ secrets.WINSCP_PASS }}
+          FTP_HOST: ${{ secrets.WINSCP_HOST }}
+          FTP_PORT: 21  # 🔧 FTP默认端口改为21
+          FTP_PATH: "/www/wwwroot/guige.host/"  # 🔧 路径改为Linux风格
         run: |
           lftp -u "$FTP_USER,$FTP_PASS" -p $FTP_PORT ftp://$FTP_HOST <<EOF
-          mirror -R --delete --verbose ./public $FTP_PATH
+          set ftp:passive-mode true  # 🔧 启用被动模式解决防火墙问题
+          set ftp:charset utf8  # 🔧 确保中文文件名兼容
+          mirror -R --delete --verbose ./public "$FTP_PATH"
           quit
           EOF
