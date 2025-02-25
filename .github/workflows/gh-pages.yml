@@ -31,12 +31,12 @@ jobs:
           FTP_PASS: ${{ secrets.WINSCP_PASS }}
           FTP_HOST: ${{ secrets.WINSCP_HOST }}
           FTP_PORT: 21
-          FTP_PATH: "guige.host/"  # 关键修改点1
+          FTP_PATH: "C:/www/wwwroot/guige.host"  # 修改点1：使用 Windows 绝对路径
         run: |
           lftp -u "$FTP_USER,$FTP_PASS" -p $FTP_PORT ftp://$FTP_HOST <<EOF
           set ftp:passive-mode true
           set ftp:charset utf8
-          set file:charset UTF-8  # 关键修改点2
-          mirror -R --delete --verbose --parallel=4 ./public "/$FTP_PATH"  # 关键修改点3
+          set file:charset UTF-8
+          mirror -R --delete --verbose --parallel=4 ./public "$FTP_PATH"  # 修改点2：直接引用环境变量
           quit
           EOF
