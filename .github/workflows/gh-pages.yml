@@ -1,29 +1,34 @@
-name: Deploy Hugo to GitHub Pages
+name: GitHub Pages Deploy
 
-   on:
-     push:
-       branches: [ "main" ]  # ✨ 确保分支名与实际使用的分支一致
+on:
+  push:
+    branches:
+      - main  # 触发分支（根据你的实际分支名修改）
 
-   jobs:
-     build:
-       runs-on: ubuntu-latest
-       steps:
-         - name: Checkout
-           uses: actions/checkout@v4
-           with:
-             submodules: recursive  # ✅ 关键！解决主题无法拉取问题
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # 如果使用 Hugo 主题作为子模块，需启用
+          fetch-depth: 0
 
-         - name: Setup Hugo
-           uses: peaceiris/actions-hugo@v2
-           with:
-             hugo-version: 'latest'
-             extended: true  # 🚨 必须与本地安装的Hugo类型一致
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.144.1'  # 替换为你的 Hugo 版本
+          extended: true          # 如果使用 Hugo 扩展版
 
-         - name: Build
-           run: hugo --minify  # 🎯 生成优化后的静态文件
+      - name: Build
+        run: hugo --minify --gc  # 构建命令（生成 public/ 目录）
 
-         - name: Deploy
-           uses: peaceiris/actions-gh-pages@v3
-           with:
-             github_token: ${{ secrets.GITHUB_TOKEN }}  # 🔑 自动注入无需修改
-             publish_dir: ./public
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # 自动使用内置 Token
+          publish_dir: ./public     # Hugo 生成的静态文件目录
+          keep_files: false         # 是否保留旧文件（首次部署建议为 false）
