@@ -36,7 +36,7 @@ jobs:
           FTP_PASS: ${{ secrets.WINSCP_PASS }}
           FTP_HOST: ${{ secrets.WINSCP_HOST }}
           FTP_PORT: 21  # 🔧 FTP默认端口改为21
-          FTP_PATH: "/www/wwwroot/guige.host/"  # 🔧 路径改为Linux风格
+          FTP_PATH: "c:/www/wwwroot/guige.host/"  # 🔧 路径改为Linux风格
         run: |
           lftp -u "$FTP_USER,$FTP_PASS" -p $FTP_PORT ftp://$FTP_HOST <<EOF
           set ftp:passive-mode true  # 🔧 启用被动模式解决防火墙问题
