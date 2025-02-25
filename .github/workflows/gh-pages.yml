@@ -1,34 +1,44 @@
-name: GitHub Pages Deploy
+name: Deploy Hugo to Tencent Cloud via SFTP
 
 on:
   push:
-    branches:
-      - main  # 触发分支（根据你的实际分支名修改）
+    branches: [ main ]  # 触发自动部署的分支
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - name: Checkout
+      # 步骤1：拉取代码
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive  # 如果使用 Hugo 主题作为子模块，需启用
-          fetch-depth: 0
+          submodules: recursive  # 如果Hugo主题通过子模块引入，必须启用此选项
 
+      # 步骤2：安装指定版本的Hugo
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: '0.144.1'  # 替换为你的 Hugo 版本
-          extended: true          # 如果使用 Hugo 扩展版
+          hugo-version: "0.144.1"  # 替换为你实际使用的Hugo版本
+          extended: true  # 使用Hugo扩展版（支持Sass等）
 
-      - name: Build
-        run: hugo --minify --gc  # 构建命令（生成 public/ 目录）
+      # 步骤3：构建静态网站
+      - name: Build Site
+        run: hugo --minify  # 生成优化后的静态文件到/public目录
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}  # 自动使用内置 Token
-          publish_dir: ./public     # Hugo 生成的静态文件目录
-          keep_files: false         # 是否保留旧文件（首次部署建议为 false）
+      # 步骤4：安装SFTP依赖工具lftp
+      - name: Install lftp
+        run: sudo apt-get install -y lftp  # 安装SFTP客户端工具
+
+      # 步骤5：通过SFTP上传到服务器
+      - name: Upload Files via SFTP
+        env:
+          FTP_USER: ${{ secrets.WINSCP_USER }}    # 从GitHub Secrets读取用户名
+          FTP_PASS: ${{ secrets.WINSCP_PASS }}    # 从GitHub Secrets读取密码
+          FTP_HOST: ${{ secrets.WINSCP_HOST }}    # SFTP服务器地址（如IP）
+          FTP_PORT: ${{ secrets.WINSCP_PORT }}    # SFTP端口（默认22）
+          FTP_PATH: "/www/wwwroot/guige.host"     # 服务器目标目录
+        run: |
+          lftp -u "$FTP_USER,$FTP_PASS" -p $FTP_PORT sftp://$FTP_HOST <<EOF
+          mirror -R --delete --verbose ./public $FTP_PATH
+          quit
+          EOF
