@@ -36,7 +36,7 @@ jobs:
           FTP_PASS: ${{ secrets.WINSCP_PASS }}    # 从GitHub Secrets读取密码
           FTP_HOST: ${{ secrets.WINSCP_HOST }}    # SFTP服务器地址（如IP）
           FTP_PORT: ${{ secrets.WINSCP_PORT }}    # SFTP端口（默认22）
-          FTP_PATH: "C:\www\wwwroot\guige.host"     # 服务器目标目录
+          FTP_PATH: "C:\\www\\wwwroot\\guige.host\\"     # 服务器目标目录
         run: |
           lftp -u "$FTP_USER,$FTP_PASS" -p $FTP_PORT sftp://$FTP_HOST <<EOF
           mirror -R --delete --verbose ./public $FTP_PATH
