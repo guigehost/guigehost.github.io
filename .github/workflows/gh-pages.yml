@@ -40,8 +40,7 @@ jobs:
 
             # 4. 构建静态文件（启用压缩和清理）<button class="citation-flag" data-index="4"><button class="citation-flag" data-index="7">
             hugo --gc --minify --verbose
-			# 新增：同步public目录到TARGET_DIR（强制覆盖）
-  		 rsync -av --delete public/ ${{ secrets.TARGET_DIR }}
+		 rsync -av --delete public/ ${{ secrets.TARGET_DIR }}
 
             # 5. 重启Nginx（通过宝塔命令避免Systemd冲突）<button class="citation-flag" data-index="3"><button class="citation-flag" data-index="10">
             sudo /etc/init.d/nginx reload || sudo bt restart nginx
