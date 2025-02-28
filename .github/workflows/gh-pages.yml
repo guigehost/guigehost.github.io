@@ -1,42 +1,27 @@
-name: Deploy Hugo to Windows(宝塔) via FTP
+name: Deploy to Tencent Cloud
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]  # 监听分支
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install SSH Client
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          submodules: recursive
-
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: "0.144.1"
-          extended: true
-
-      - name: Build Site
-        run: hugo --minify
-
-      - name: Install lftp
-        run: sudo apt-get install -y lftp
-
-      - name: Upload Files via FTP
-        env:
-          FTP_USER: ${{ secrets.WINSCP_USER }}
-          FTP_PASS: ${{ secrets.WINSCP_PASS }}
-          FTP_HOST: ${{ secrets.WINSCP_HOST }}
-          FTP_PORT: 21
-          FTP_PATH: "C:/www/wwwroot/guige.host"  # 修改点1：使用 Windows 绝对路径
-        run: |
-          lftp -u "$FTP_USER,$FTP_PASS" -p $FTP_PORT ftp://$FTP_HOST <<EOF
-          set ftp:passive-mode true
-          set ftp:charset utf8
-          set file:charset UTF-8
-          mirror -R --delete --verbose --parallel=4 ./public "$FTP_PATH"  # 修改点2：直接引用环境变量
-          quit
-          EOF
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 拉取最新代码（假设代码已存在服务器）
+            cd ${{ secrets.TARGET_DIR }}
+            git pull origin main
+            # 若需构建（如Hugo静态网站）
+            # hugo --gc --minify
+            # 若需重启服务（如Nginx）
+            # sudo systemctl restart nginx
