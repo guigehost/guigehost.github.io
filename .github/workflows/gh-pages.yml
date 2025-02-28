@@ -1,3 +1,10 @@
+name: Deploy to Tencent Cloud
+
+on:
+  push:
+    branches: [main]  # 监听分支
+
+
 jobs:
   deploy:
     steps:
