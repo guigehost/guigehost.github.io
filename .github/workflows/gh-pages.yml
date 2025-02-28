@@ -17,19 +17,19 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: 
-            # 1. 确保部署目录存在（兼容宝塔路径）
+          script: |
+            # 1. 确保部署目录存在（兼容宝塔路径） <button class="citation-flag" data-index="7"><button class="citation-flag" data-index="8">
             mkdir -p ${{ secrets.TARGET_DIR }}
             cd ${{ secrets.TARGET_DIR }}
 
-            # 2. 初始化仓库（若未存在）
+            # 2. 初始化仓库（若未存在） <button class="citation-flag" data-index="3"><button class="citation-flag" data-index="10">
             if [ ! -d ".git" ]; then
-              git clone git@github.com:guigehost/guigehost.github.io.git
+              git clone git@github.com:guigehost/guigehost.github.io.git .
             else
               git fetch --all && git reset --hard origin/main && git pull
             fi
 
-            # 3. 安装Hugo（仅当未安装时）<button class="citation-flag" data-index="1"><button class="citation-flag" data-index="6">
+            # 3. 安装Hugo（仅当未安装时） <button class="citation-flag" data-index="3"><button class="citation-flag" data-index="6">
             if ! command -v hugo &> /dev/null; then
               echo "Installing Hugo..."
               wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.121.1/hugo_extended_0.121.1_linux-amd64.tar.gz
@@ -38,13 +38,20 @@ jobs:
               sudo chmod +x /usr/local/bin/hugo
             fi
 
-            # 4. 构建静态文件（启用压缩和清理）<button class="citation-flag" data-index="4"><button class="citation-flag" data-index="7">
+            # 4. 构建静态文件（启用压缩和清理） <button class="citation-flag" data-index="4"><button class="citation-flag" data-index="7">
             hugo --gc --minify --verbose
-		 rsync -av --delete public/ ${{ secrets.TARGET_DIR }}
 
-            # 5. 重启Nginx（通过宝塔命令避免Systemd冲突）<button class="citation-flag" data-index="3"><button class="citation-flag" data-index="10">
+            # 5. 同步public目录到目标路径（强制覆盖） <button class="citation-flag" data-index="8">
+            rsync -av --delete public/ ${{ secrets.TARGET_DIR }}
+
+            # 6. 修正文件权限（适配宝塔） <button class="citation-flag" data-index="7">
+            sudo chown -R www:www ${{ secrets.TARGET_DIR }}
+            sudo find ${{ secrets.TARGET_DIR }} -type d -exec chmod 755 {} \;
+            sudo find ${{ secrets.TARGET_DIR }} -type f -exec chmod 644 {} \;
+
+            # 7. 重启Nginx（通过宝塔命令） <button class="citation-flag" data-index="3"><button class="citation-flag" data-index="10">
             sudo /etc/init.d/nginx reload || sudo bt restart nginx
 
-            # 6. 验证部署结果
+            # 8. 验证部署结果
             echo "Deployment completed. Checking Nginx status..."
-            curl -I http://localhost || echo "Localhost check failed"+
+            curl -I http://localhost || echo "Localhost check failed"
