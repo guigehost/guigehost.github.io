@@ -7,6 +7,7 @@ on:
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     steps:
       - name: SSH to Server
         uses: appleboy/ssh-action@v1.0.0
