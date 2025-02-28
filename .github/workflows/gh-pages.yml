@@ -1,27 +1,30 @@
-name: Deploy to Tencent Cloud
-
-on:
-  push:
-    branches: [main]  # 监听分支
-
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install SSH Client
+      - name: SSH to Server
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # 拉取最新代码（假设代码已存在服务器）
+            # 1. 确保目录存在
+            mkdir -p ${{ secrets.TARGET_DIR }}
             cd ${{ secrets.TARGET_DIR }}
-            git pull origin main
-            # 若需构建（如Hugo静态网站）
+            
+            # 2. 克隆仓库（若未初始化）
+            if [ ! -d ".git" ]; then
+              git clone git@github.com:guigehost/guigehost.github.io.git .
+            else
+              git pull origin main
+            fi
+            
+            # 3. 安装Hugo（若缺失）
+            if ! command -v hugo &> /dev/null; then
+              wget https://github.com/gohugoio/hugo/releases/download/v0.121.1/hugo_extended_0.121.1_linux-arm64.tar.gz
+              tar -xvf hugo*.tar.gz
+              sudo mv hugo /usr/local/bin/
+            fi
+            
+            # 4. 构建静态文件
             hugo --gc --minify
-            # 若需重启服务（如Nginx）
-            sudo systemctl restart nginx
+            
+            # 5. 重启Nginx（确保配置正确）
+            sudo nginx -t && sudo systemctl restart nginx
