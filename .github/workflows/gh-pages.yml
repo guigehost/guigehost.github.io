@@ -17,7 +17,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+          script: 
             # 1. 确保部署目录存在（兼容宝塔路径）
             mkdir -p ${{ secrets.TARGET_DIR }}
             cd ${{ secrets.TARGET_DIR }}
