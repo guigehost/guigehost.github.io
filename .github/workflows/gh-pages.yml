@@ -22,6 +22,6 @@ jobs:
             cd ${{ secrets.TARGET_DIR }}
             git pull origin main
             # 若需构建（如Hugo静态网站）
-            # hugo --gc --minify
+            hugo --gc --minify
             # 若需重启服务（如Nginx）
-            # sudo systemctl restart nginx
+            sudo systemctl restart nginx
