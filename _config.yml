@@ -1,0 +1,29 @@
+# 网站基础配置
+title: 龟兔算法
+subtitle: 「龟速积累，兔跃突破：对抗知识的熵增暴政」
+description: 技术博客专注分布式系统与算法工程化实践
+author: 光影@876
+email: guige20231@outlook.com
+language: zh-CN
+timezone: Asia/Shanghai
+
+
+# 部署配置
+deploy:
+  type: git
+  repo: git@github.com:guigehost/guigehost.github.io.git
+  branch: main
+
+# 响应式主题配置
+theme: anzhiyu
+responsive: true
+font:
+  base: '"Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", sans-serif'
+  code: '"Fira Code", "Courier New", monospace'
+
+# 文章展示配置
+excerpt_link: 阅读全文
+highlight:
+  enable: true
+  line_number: false
+
