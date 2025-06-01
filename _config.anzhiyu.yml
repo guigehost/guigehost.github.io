@@ -71,18 +71,14 @@ social:
 
 # 作者卡片 状态
 author_status:
-  enable: false
+  enable: true
   # 可以是任何图片，建议放表情包或者emoji图片，效果都很好，[表情包速查](https://emotion.xiaokang.me/)
-  statusImg: "https://bu.dusays.com/2023/08/24/64e6ce9c507bb.png"
+  statusImg: "https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i204ohzlckj30m80m8426.jpg"
   skills:
-    # - 🤖️ 数码科技爱好者
-    # - 🔍 分享与热心帮助
-    # - 🏠 智能家居小能手
-    # - 🔨 设计开发一条龙
-    # - 🤝 专修各种疑难杂症
-    # - 🏃 脚踏实地行动派
-    # - 🧱 团队小组发动机
-    # - 💢 壮汉人狠话不多
+    - 🤖️ 数码科技爱好者
+    - 🔍 分享与热心帮助
+    - 🏠 智能家居小能手
+    - 🤝 专修各种疑难杂症
 
 # search (搜索)
 # see https://blog.anheyu.com/posts/c27d.html#搜索系统
@@ -140,7 +136,7 @@ favicon: /favicon.ico
 
 # Avatar (头像)
 avatar:
-  img: https://bu.dusays.com/2023/04/27/64496e511b09c.jpg
+  img: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i2053rwddpj30lc0sgdlm.jpg
   effect: false
 
 # Disable all banner image
@@ -243,15 +239,15 @@ post_copyright:
   copyright_author_link: /
 
 # Sponsor/reward
-# reward:
-#   enable: true  
-#   QR_code:
-#     - img: https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/qrcode-weichat.png
-#       link:
-#       text: 微信
-#     - img: https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/qrcode-alipay.png
-#       link:
-#       text: 支付宝
+reward:
+  enable: true  
+  QR_code:
+    - img: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i204ok2ndaj30n00v80v8.jpg
+      link:
+      text: 微信
+    - img: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i204okhik7j31bg1z445e.jpg
+      link:
+      text: 支付宝
 
 # Post edit
 # Easily browse and edit blog source code online.
@@ -430,11 +426,11 @@ footer:
     since: 2025
   custom_text:
   runtime:
-    enable: false
+    enable: true
     launch_time: 06/01/2025 14:00:00 # 网站上线时间
-    work_img: https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-上班摸鱼中.svg
+    work_img: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i204oieo6gj308w02sglu.jpg
     work_description: 距离Success也就还差一个大佬带我~
-    offduty_img: https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-下班啦.svg
+    offduty_img: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i204oi9j4bj308w02smxe.jpg
     offduty_description: 下班了就不要吵小编了，小编很忙的，嘿嘿~
   # 徽标部分配置项 https://shields.io/
   # https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr
@@ -528,12 +524,12 @@ footer:
       enable: false
       link: /copyright
     linkList:
-      - link: https://github.com/anzhiyu-c/hexo-theme-anzhiyu
-        text: 主题
+#       - link: https://github.com/anzhiyu-c/hexo-theme-anzhiyu
+#         text: 主题
       # - link: https://image.anheyu.com
       #   text: 图床
-      # - link: https://beian.miit.gov.cn/
-      #   text: 湘ICP备-xxxxxxx号
+      - link: https://beian.miit.gov.cn/
+        text: 苏ICP备2025160633号-1
     subTitle:
       enable: false
       # Typewriter Effect (打字效果)
@@ -817,7 +813,7 @@ aside:
   card_weixin:
     enable: true
     face: https://bu.dusays.com/2023/01/13/63c02edf44033.png
-    backFace: https://bu.dusays.com/2023/05/13/645fa415e8694.png
+    backFace: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i206mjpo60j30p00an765.jpg
   card_recent_post:
     enable: true
     limit: 5 # if set 0 will show all
@@ -860,7 +856,7 @@ busuanzi:
 # Formal: Month/Day/Year Time or Year/Month/Day Time
 runtimeshow:
   enable: true
-  publish_date: 4/1/2021 00:00:00
+  publish_date: 6/1/2025 14:00:00
 
 # Console - Newest Comments
 newest_comments:
@@ -1064,28 +1060,33 @@ home_top:
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
       icon: anzhiyu-icon-dove
-    - name: Windows分享
-      path: /categories/Windows分享/
-      shadow: var(--anzhiyu-shadow-red)
-      class: red
-      icon: anzhiyu-icon-fire
-    - name: 安卓分享
-      path: /categories/安卓分享/
-      shadow: var(--anzhiyu-shadow-green)
-      class: green
-      icon: anzhiyu-icon-book
+#     - name: Windows分享
+#       path: /categories/Windows分享/
+#       shadow: var(--anzhiyu-shadow-red)
+#       class: red
+#       icon: anzhiyu-icon-fire
+#     - name: 安卓分享
+#       path: /categories/安卓分享/
+#       shadow: var(--anzhiyu-shadow-green)
+#       class: green
+#       icon: anzhiyu-icon-book
     - name: AI工具分享
       path: /categories/AI工具分享/
       shadow: var(--anzhiyu-shadow-green)
       class: green
       icon: anzhiyu-icon-book
-    - name: 办公技能分享
-      path: /categories/办公技能分享/
+#     - name: 办公技能分享
+#       path: /categories/办公技能分享/
+#       shadow: var(--anzhiyu-shadow-green)
+#       class: green
+#       icon: anzhiyu-icon-book
+    - name: 探索发现
+      path: /categories/探索发现/
       shadow: var(--anzhiyu-shadow-green)
       class: green
       icon: anzhiyu-icon-book
-    - name: 探索发现
-      path: /categories/探索发现/
+    - name: 遛娃分享
+      path: /categories/遛娃分享/
       shadow: var(--anzhiyu-shadow-green)
       class: green
       icon: anzhiyu-icon-book
@@ -1095,10 +1096,10 @@ home_top:
     swiper_css: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.css #swiper css依赖
     swiper_js: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.js #swiper js依赖
   banner:
-    tips: 新品主题
-    title: Theme-AnZhiYu
+    tips: 随便逛逛吧
+    title: 小世界--guige
     image: https://bu.dusays.com/2023/05/13/645fa3cf90d70.webp
-    link: https://docs.anheyu.com/
+    link: https://guige.host/
 
 # 朋友圈配置
 friends_vue:
