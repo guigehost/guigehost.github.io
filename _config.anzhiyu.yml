@@ -1055,7 +1055,7 @@ home_top:
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
       icon: anzhiyu-icon-dove
-    - name: Mac|ios分享
+    - name: Mac&ios分享
       path: /categories/Mac&ios分享/
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
