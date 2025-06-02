@@ -27,20 +27,21 @@
   helloAbout: Hello there!
   skillsTips:
     tips: 技能
-    title: 开启创造力
+    title: 开启创造力｜有的只是一股劲
+    background: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20zto6asaj30h00bv0st.jpg
   careers:
-    tips: 生涯
+    tips: 勇往直前
     title: 无限进步
-    img: https://bu.dusays.com/2023/04/21/644287166329b.png
+    img: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20ze97oeuj30h00bcjrx.jpg
   statistic:
     link: /archives
     text: 文章隧道
-    cover: https://bu.dusays.com/2023/05/01/644f4b037b930.jpg
+    cover: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20zeyuwtuj30h00baglu.jpg
   map:
     title: 我现在住在
     StrengthenTitle: 中国，海边的一座小港
-    background: https://bu.dusays.com/2023/07/05/64a4c61cb20ef.jpg
-    backgroundDark: https://bu.dusays.com/2023/07/05/64a4c63495ac5.jpg
+    background: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20zaql7g1j30k80dhn05.jpg
+    backgroundDark: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20zbut09yj30zk0nptd7.jpg
   selfInfo:
     selfInfoTips1: 生于
     selfInfoContentYear: 20世纪
@@ -51,8 +52,8 @@
   personalities:
     author_name: 指挥官
     personality_type: ENTJ
-    photo_url: https://bu.dusays.com/2023/07/05/64a4c63495ac5.jpg
-    personality_img: https://npm.elemecdn.com/anzhiyu-blog@2.0.8/img/svg/ESFJ-A.svg
+    photo_url: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20zct2d2aj30h007gwer.jpg
+    personality_img: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20zjstyehj30h00h0js0.jpg
     name_url: https://www.16personalities.com/ch/esfj-%E4%BA%BA%E6%A0%BC
   maxim:
     maxim_tips: 座右铭

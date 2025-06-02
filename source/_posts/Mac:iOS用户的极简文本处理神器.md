@@ -4,7 +4,7 @@ date: 2025-06-01 23:30:00
 categories: [Mac&ios分享]
 tags: [效率工具, 文本处理, 快速笔记, iCloud同步]
 excerpt: 像使用便签纸一样便捷的跨设备文本处理工具，专为追求极致效率的用户设计
-cover: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i207lknoefj31z415ogs8.jpg
+cover:  https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20wlzntz4j30h00bcq3s.jpg
 ---
 
 ## 为什么你需要这个「数字便签纸」
@@ -19,7 +19,7 @@ cover: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006Ux
 
 ## ✨ 核心功能全景图
 
-![image-20250601235402234](https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i209qfjidfj30gu0lyq54.jpg)
+<img src="https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i209qfjidfj30gu0lyq54.jpg" alt="image-20250601235402234" style="zoom:50%;" />
 
 ### 🚀 效率增强特性
 
@@ -57,7 +57,7 @@ user_id = current_session[:id]
 
 ### 案例3：跨设备协作
 
-![image-20250601235452902](https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i209r8ipb5j316k0gqmzw.jpg)
+<img src="https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i209r8ipb5j316k0gqmzw.jpg" alt="image-20250601235452902" style="zoom:50%;" />
 
 ## ⚡ 为什么选择Scrap Paper
 
@@ -70,7 +70,7 @@ user_id = current_session[:id]
 
 [扫码下载]
 
-<img src='https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i2098miz1qj30sg0sgjuy.jpg' alt='006UxPqMgy1i2098miz1qj30sg0sgjuy'/>
+<img src='https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i2098miz1qj30sg0sgjuy.jpg' alt='006UxPqMgy1i2098miz1qj30sg0sgjuy' style="zoom:10%;"/>
 
 ---
 
@@ -84,3 +84,6 @@ user_id = current_session[:id]
 
 ━━━━◈ 𝟮𝟬𝟮𝟱.𝟬𝟲.𝟬𝟭 ◈━━━━━
 
+<img src='https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20y2sr5aej3032032dfw.jpg' alt='006UxPqMgy1i20y2sr5aej3032032dfw'/>
+
+**关注不迷路，欢迎小编的微信公众号，小编同步更新哦！！！**

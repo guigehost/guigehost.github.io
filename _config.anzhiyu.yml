@@ -4,10 +4,10 @@ menu:
     分类: /categories/ || anzhiyu-icon-shapes
     标签: /tags/ || anzhiyu-icon-tags
 
-  友链:
+#   友链:
 #     友人帐: /link/ || anzhiyu-icon-link
 #     朋友圈: /fcircle/ || anzhiyu-icon-artstation
-    留言板: /comments/ || anzhiyu-icon-envelope
+#     留言板: /comments/ || anzhiyu-icon-envelope
 
 #   我的:
 #     音乐馆: /music/ || anzhiyu-icon-music
