@@ -1060,11 +1060,11 @@ home_top:
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
       icon: anzhiyu-icon-dove
-#     - name: Windows分享
-#       path: /categories/Windows分享/
-#       shadow: var(--anzhiyu-shadow-red)
-#       class: red
-#       icon: anzhiyu-icon-fire
+    - name: Windows分享
+      path: /categories/Windows分享/
+      shadow: var(--anzhiyu-shadow-red)
+      class: red
+      icon: anzhiyu-icon-fire
 #     - name: 安卓分享
 #       path: /categories/安卓分享/
 #       shadow: var(--anzhiyu-shadow-green)
