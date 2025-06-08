@@ -141,4 +141,4 @@ cover: https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006Ux
 
 <img src='https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20y2sr5aej3032032dfw.jpg' alt='006UxPqMgy1i20y2sr5aej3032032dfw'/>
 
-**关注不迷路，欢迎小编的微信公众号，小编同步更新哦！！！**
+**关注不迷路，欢迎关注小编的微信公众号，小编同步更新哦！！！**
