@@ -1,7 +1,7 @@
 ---
 title: Scrap Paper：Mac/iOS用户的极简文本处理神器
 date: 2025-06-01 23:30:00
-categories: [Mac&ios分享]
+categories: [Macios分享]
 tags: [效率工具, 文本处理, 快速笔记, iCloud同步]
 excerpt: 像使用便签纸一样便捷的跨设备文本处理工具，专为追求极致效率的用户设计
 cover:  https://image.baidu.com/search/down?url=http://ww1.sinaimg.cn/large/006UxPqMgy1i20wlzntz4j30h00bcq3s.jpg
