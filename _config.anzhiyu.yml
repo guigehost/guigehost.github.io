@@ -531,6 +531,8 @@ footer:
       #   text: 图床
       - link: https://beian.miit.gov.cn/
         text: 苏ICP备2025160633号-1
+      - link: https://beian.mps.gov.cn/#/query/webSearch?code=32070602010179
+        text: 苏公网安备32070602010179号      
     subTitle:
       enable: false
       # Typewriter Effect (打字效果)
