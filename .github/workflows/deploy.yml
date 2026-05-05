@@ -39,17 +39,17 @@ jobs:
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -p ${{ secrets.SSH_PORT || '22' }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'REMOTE'
             set -e
             cd /opt/guige-host || cd ~/guige-host || exit 1
-            
+
             echo "Pulling latest code..."
             git pull origin main
-            
+
             echo "Building and restarting containers..."
             docker compose down
             docker compose up --build -d
-            
+
             echo "Cleaning up old images..."
             docker image prune -f
-            
+
             echo "Deployment complete!"
           REMOTE
 
@@ -85,25 +85,39 @@ jobs:
       - name: 📦 Build & Deploy to server
         run: |
           echo "=== 🚀 Deploying to server (PM2 mode) ==="
+
+          # 打包代码（排除不需要的文件）
+          echo "📦 Packing source code..."
+          tar czf /tmp/deploy.tar.gz \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='dist' \
+            --exclude='.env' \
+            -C "$GITHUB_WORKSPACE" .
+
+          # 上传代码到服务器
+          echo "📤 Uploading to server..."
+          scp -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -P ${{ secrets.SSH_PORT || '22' }} /tmp/deploy.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/guige-host/deploy.tar.gz
+
+          # 在服务器上解压、安装、构建、重启
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -p ${{ secrets.SSH_PORT || '22' }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'REMOTE'
             set -e
-            
-            # 进入项目目录
-            cd /opt/guige-host || cd ~/guige-host || exit 1
-            
-            echo "📥 Pulling latest code..."
-            git pull origin main
-            
+            cd /opt/guige-host || exit 1
+
+            echo "📥 Extracting code..."
+            tar xzf deploy.tar.gz
+            rm deploy.tar.gz
+
             echo "📦 Installing dependencies..."
             npm install --prefer-offline --no-audit
-            
+
             echo "🔨 Building project..."
             npm run build
-            
+
             echo "🔄 Restarting PM2 service..."
             pm2 restart guige-host || pm2 start npm --name "guige-host" -- start
             pm2 save
-            
+
             echo "✅ Deployment complete!"
           REMOTE
 
