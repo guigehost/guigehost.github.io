@@ -1,0 +1,114 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ==================== 方案一: Docker 部署 (推荐) ====================
+  # 需要服务器上安装 Docker + Docker Compose
+  # ================================================================
+  deploy-docker:
+    name: 🐳 Docker Deploy
+    runs-on: ubuntu-latest
+    # 取消注释下面这行来使用此方案
+    # if: true
+    if: false  # 默认关闭，取消此行注释启用
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 🧪 Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SSH_PORT || '22' }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: 🐳 Build and deploy with Docker Compose
+        run: |
+          echo "=== 🚀 Deploying to server (Docker mode) ==="
+          ssh -p ${{ secrets.SSH_PORT || '22' }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'REMOTE'
+            set -e
+            cd /opt/guige-host || cd ~/guige-host || exit 1
+            
+            echo "Pulling latest code..."
+            git pull origin main
+            
+            echo "Building and restarting containers..."
+            docker compose down
+            docker compose up --build -d
+            
+            echo "Cleaning up old images..."
+            docker image prune -f
+            
+            echo "Deployment complete!"
+          REMOTE
+
+      - name: ✅ Verify deployment
+        run: |
+          sleep 5
+          curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SSH_HOST }}:3000/api/trpc/ping || true
+          echo "Deployed!"
+
+  # ==================== 方案二: PM2 + Nginx 部署 ====================
+  # 需要服务器上已安装 Node.js 20 + PM2 + Nginx
+  # ================================================================
+  deploy-pm2:
+    name: ⚡ PM2 Deploy
+    runs-on: ubuntu-latest
+    # 默认启用此方案
+    if: true
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 🧪 Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SSH_PORT || '22' }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: 📦 Build & Deploy to server
+        run: |
+          echo "=== 🚀 Deploying to server (PM2 mode) ==="
+          ssh -p ${{ secrets.SSH_PORT || '22' }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'REMOTE'
+            set -e
+            
+            # 进入项目目录
+            cd /opt/guige-host || cd ~/guige-host || exit 1
+            
+            echo "📥 Pulling latest code..."
+            git pull origin main
+            
+            echo "📦 Installing dependencies..."
+            npm ci --prefer-offline --no-audit
+            
+            echo "🔨 Building project..."
+            npm run build
+            
+            echo "🔄 Restarting PM2 service..."
+            pm2 restart guige-host || pm2 start npm --name "guige-host" -- start
+            pm2 save
+            
+            echo "✅ Deployment complete!"
+          REMOTE
+
+      - name: ✅ Health check
+        run: |
+          sleep 3
+          curl -s http://${{ secrets.SSH_HOST }}:3000/api/trpc/ping || true
+          echo "Server should be up!"
