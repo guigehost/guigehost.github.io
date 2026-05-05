@@ -95,7 +95,7 @@ jobs:
             git pull origin main
             
             echo "📦 Installing dependencies..."
-            npm ci --prefer-offline --no-audit
+            npm install --prefer-offline --no-audit
             
             echo "🔨 Building project..."
             npm run build
