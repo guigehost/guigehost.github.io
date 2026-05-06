@@ -15,6 +15,7 @@ import { trpc } from "@/providers/trpc";
 import ArticleCard from "@/sections/ArticleCard";
 import ToolCard from "@/sections/ToolCard";
 import AnimatedSection from "@/sections/AnimatedSection";
+import AdBanner from "@/components/AdBanner";
 
 export default function Home() {
   const { data: articleData } = trpc.article.list.useQuery({
@@ -142,6 +143,9 @@ export default function Home() {
           <ChevronDown size={20} className="animate-bounce" />
         </div>
       </section>
+
+      {/* ===== AD BANNER ===== */}
+      <AdBanner />
 
       {/* ===== FEATURES / WHAT YOU GET ===== */}
       <section className="py-24 sm:py-32 bg-muted/20">
@@ -349,6 +353,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ===== AD BANNER ===== */}
+      <AdBanner />
 
       {/* ===== WECHAT CTA ===== */}
       <section className="py-24 sm:py-32 bg-background">

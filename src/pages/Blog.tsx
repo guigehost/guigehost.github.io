@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/providers/trpc";
 import ArticleCard from "@/sections/ArticleCard";
 import AnimatedSection from "@/sections/AnimatedSection";
+import AdBanner from "@/components/AdBanner";
 
 export default function Blog() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -97,7 +98,10 @@ export default function Blog() {
       ) : articleData?.articles && articleData.articles.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articleData.articles.map((article, i) => (
-            <ArticleCard key={article.id} article={article} index={i} />
+            <>
+              <ArticleCard key={article.id} article={article} index={i} />
+              {i === 2 && <AdBanner key="ad-1" className="col-span-full" />}
+            </>
           ))}
         </div>
       ) : (

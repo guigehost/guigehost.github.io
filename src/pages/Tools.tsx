@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/providers/trpc";
 import ToolCard from "@/sections/ToolCard";
 import AnimatedSection from "@/sections/AnimatedSection";
+import AdBanner from "@/components/AdBanner";
 
 const platforms = [
   { label: "全部", value: "" },
@@ -83,7 +84,10 @@ export default function Tools() {
       ) : toolData?.tools && toolData.tools.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {toolData.tools.map((tool, i) => (
-            <ToolCard key={tool.id} tool={tool} index={i} />
+            <>
+              <ToolCard key={tool.id} tool={tool} index={i} />
+              {i === 2 && <AdBanner key="ad-1" className="col-span-full" />}
+            </>
           ))}
         </div>
       ) : (

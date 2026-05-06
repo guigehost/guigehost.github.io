@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import LogoIcon from "@/components/LogoIcon";
 import { FileText, Wrench, AppWindow, User, ArrowUpRight, Shield, ExternalLink } from "lucide-react";
 import { trpc } from "@/providers/trpc";
+import AdBanner from "@/components/AdBanner";
 
 export default function Footer() {
   const { data: links } = trpc.link.list.useQuery({ activeOnly: true });
@@ -124,6 +125,9 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Ad Banner */}
+      <AdBanner />
     </footer>
   );
 }
