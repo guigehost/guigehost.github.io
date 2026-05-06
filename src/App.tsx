@@ -16,6 +16,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminArticles from "./pages/AdminArticles";
 import AdminArticleEdit from "./pages/AdminArticleEdit";
 import AdminTools from "./pages/AdminTools";
+import AdminLinks from "./pages/AdminLinks";
+import AdminSettings from "./pages/AdminSettings";
 
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -106,6 +108,8 @@ export default function App() {
         <Route path="articles/new" element={<AdminArticleEdit />} />
         <Route path="articles/edit/:id" element={<AdminArticleEdit />} />
         <Route path="tools" element={<AdminTools />} />
+        <Route path="links" element={<AdminLinks />} />
+        <Route path="settings" element={<AdminSettings />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

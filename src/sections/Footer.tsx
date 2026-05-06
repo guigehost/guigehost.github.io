@@ -1,8 +1,10 @@
 import { Link } from "react-router";
 import LogoIcon from "@/components/LogoIcon";
-import { FileText, Wrench, AppWindow, User, ArrowUpRight, Shield } from "lucide-react";
+import { FileText, Wrench, AppWindow, User, ArrowUpRight, Shield, ExternalLink } from "lucide-react";
+import { trpc } from "@/providers/trpc";
 
 export default function Footer() {
+  const { data: links } = trpc.link.list.useQuery({ activeOnly: true });
   return (
     <footer className="bg-muted/30 border-t border-border mt-20">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-16">
@@ -26,7 +28,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <h4 className="text-sm font-semibold text-foreground mb-5">站点导航</h4>
             <ul className="space-y-3">
               {[
@@ -44,6 +46,29 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="md:col-span-2">
+            <h4 className="text-sm font-semibold text-foreground mb-5">友情链接</h4>
+            {links && links.length > 0 ? (
+              <ul className="space-y-3">
+                {links.map((link) => (
+                  <li key={link.id}>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 group"
+                    >
+                      <ExternalLink size={14} />
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">暂无友链</p>
+            )}
           </div>
 
           <div className="md:col-span-4">

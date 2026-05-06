@@ -123,3 +123,30 @@ export const onlineTools = mysqlTable("online_tools", {
 
 export type OnlineTool = typeof onlineTools.$inferSelect;
 export type InsertOnlineTool = typeof onlineTools.$inferInsert;
+
+// --- Friend Links ---
+export const links = mysqlTable("links", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  url: varchar("url", { length: 500 }).notNull(),
+  description: varchar("description", { length: 255 }),
+  icon: varchar("icon", { length: 500 }),
+  sortOrder: int("sort_order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Link = typeof links.$inferSelect;
+export type InsertLink = typeof links.$inferInsert;
+
+// --- Site Settings (key-value) ---
+export const settings = mysqlTable("settings", {
+  id: serial("id").primaryKey(),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  value: text("value"),
+  description: varchar("description", { length: 255 }),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type Setting = typeof settings.$inferSelect;
+export type InsertSetting = typeof settings.$inferInsert;

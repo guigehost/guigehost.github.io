@@ -53,6 +53,7 @@ export default function AdminArticles() {
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">标题</th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">分类</th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">状态</th>
+              <th className="text-left px-4 py-3 font-medium text-muted-foreground">阅读</th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">日期</th>
               <th className="text-right px-4 py-3 font-medium text-muted-foreground">操作</th>
             </tr>
@@ -75,6 +76,9 @@ export default function AdminArticles() {
                   }`}>
                     {article.status === "published" ? "已发布" : "草稿"}
                   </span>
+                </td>
+                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                  {article.viewCount ?? 0}
                 </td>
                 <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                   {new Date(article.createdAt).toLocaleDateString("zh-CN")}
@@ -104,14 +108,14 @@ export default function AdminArticles() {
             ))}
             {isLoading && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                   加载中...
                 </td>
               </tr>
             )}
             {!isLoading && !data?.articles.length && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                   暂无文章
                 </td>
               </tr>
