@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Play, ExternalLink, Sparkles, Clock } from "lucide-react";
+import { Search, Play, ExternalLink, Sparkles, Clock, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,30 +13,90 @@ interface DramaItem {
   episodes: number;
 }
 
+interface ApiResponse {
+  code: number;
+  msg: string;
+  data?: unknown;
+}
+
+function normalizeResults(raw: unknown): DramaItem[] {
+  if (!raw) return [];
+
+  let list: unknown[] = [];
+  if (Array.isArray(raw)) {
+    list = raw;
+  } else if (typeof raw === "object" && raw !== null) {
+    const obj = raw as Record<string, unknown>;
+    if (Array.isArray(obj.list)) list = obj.list;
+    else if (Array.isArray(obj.data)) list = obj.data;
+    else if (Array.isArray(obj.results)) list = obj.results;
+    else {
+      const possibleArray = Object.values(obj).find((v) => Array.isArray(v));
+      if (possibleArray) list = possibleArray;
+    }
+  }
+
+  return list
+    .map((item: unknown, idx: number) => {
+      if (typeof item !== "object" || item === null) return null;
+      const obj = item as Record<string, unknown>;
+      const title = String(obj.title ?? obj.name ?? obj.drama_name ?? obj.video_name ?? "");
+      const cover = String(obj.cover ?? obj.img ?? obj.pic ?? obj.thumb ?? obj.image ?? "");
+      const url = String(obj.url ?? obj.link ?? obj.href ?? obj.play_url ?? "");
+      const source = String(obj.source ?? obj.platform ?? obj.from ?? "星之阁");
+      const episodes = Number(obj.episodes ?? obj.episode_count ?? obj.count ?? obj.num ?? obj.total ?? 0);
+      if (!title) return null;
+      return {
+        id: String(obj.id ?? obj.book_id ?? obj.video_id ?? `${idx}`),
+        title,
+        cover,
+        source,
+        url,
+        episodes,
+      };
+    })
+    .filter(Boolean) as DramaItem[];
+}
+
 export default function Duanju() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<DramaItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [searchTime, setSearchTime] = useState(0);
+  const [error, setError] = useState("");
 
   const handleSearch = async () => {
     if (!query.trim()) return;
     setLoading(true);
     setSearched(true);
+    setError("");
     const start = performance.now();
 
-    setTimeout(() => {
-      const mockResults: DramaItem[] = [
-        { id: "1", title: `${query} - 完整版`, cover: `https://picsum.photos/seed/${query}1/300/420`, source: "优质源站A", url: "#", episodes: 80 },
-        { id: "2", title: `${query} - 高清全集`, cover: `https://picsum.photos/seed/${query}2/300/420`, source: "稳定源站B", url: "#", episodes: 100 },
-        { id: "3", title: `${query} - 热门推荐`, cover: `https://picsum.photos/seed/${query}3/300/420`, source: "极速源站C", url: "#", episodes: 60 },
-        { id: "4", title: `${query} - 完整合集`, cover: `https://picsum.photos/seed/${query}4/300/420`, source: "高清源站D", url: "#", episodes: 120 },
-      ];
-      setResults(mockResults);
+    try {
+      const res = await fetch(
+        `https://api.xingzhige.com/API/playlet/?keyword=${encodeURIComponent(query.trim())}`,
+        { method: "GET" }
+      );
+      const json = (await res.json()) as ApiResponse;
+
+      if (json.code !== 200) {
+        setError(json.msg || "搜索失败，请稍后重试");
+        setResults([]);
+      } else {
+        const items = normalizeResults(json.data);
+        setResults(items);
+        if (items.length === 0) {
+          setError("未找到相关短剧");
+        }
+      }
+    } catch (e) {
+      setError("网络请求失败，请检查网络连接");
+      setResults([]);
+    } finally {
       setSearchTime((performance.now() - start) / 1000);
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (
@@ -117,10 +177,10 @@ export default function Duanju() {
         </div>
       )}
 
-      {searched && !loading && results.length === 0 && (
+      {searched && !loading && error && (
         <div className="text-center py-20">
-          <Search size={56} className="mx-auto mb-5 text-muted-foreground/30" />
-          <p className="text-lg text-muted-foreground font-medium">未找到相关短剧</p>
+          <AlertCircle size={56} className="mx-auto mb-5 text-amber-500/60" />
+          <p className="text-lg text-muted-foreground font-medium">{error}</p>
           <p className="text-sm text-muted-foreground/60 mt-1">换个关键词试试</p>
         </div>
       )}
