@@ -1,6 +1,7 @@
 import { FileText, Wrench, Clock, Heart, MapPin, Coffee } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { trpc } from "@/providers/trpc";
+import LogoIcon from "@/components/LogoIcon";
 import AnimatedSection from "@/sections/AnimatedSection";
 
 export default function About() {
@@ -19,8 +20,8 @@ export default function About() {
       {/* Profile */}
       <AnimatedSection>
         <div className="text-center mb-14">
-          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary via-primary/80 to-amber-500 mx-auto mb-5 flex items-center justify-center text-white text-4xl font-bold ring-4 ring-amber-500/20 shadow-xl">
-            龟
+          <div className="mx-auto mb-5 flex items-center justify-center">
+            <LogoIcon size={128} className="rounded-3xl ring-4 ring-amber-500/20 shadow-xl" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">龟兔算法</h1>
           <p className="text-muted-foreground text-lg">龟速积累，兔跃突破</p>

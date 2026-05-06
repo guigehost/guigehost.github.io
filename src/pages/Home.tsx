@@ -39,8 +39,9 @@ export default function Home() {
             alt=""
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60" />
+          <div className="absolute inset-0 bg-black/10 dark:bg-black/20" />
         </div>
 
         {/* Floating decorative elements */}
@@ -59,15 +60,13 @@ export default function Home() {
           </div>
 
           {/* Main title */}
-          <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 animate-fade-up">
-            <span className="bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              龟兔算法
-            </span>
+          <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 animate-fade-up text-foreground drop-shadow-sm">
+            龟兔算法
           </h1>
 
           {/* Value proposition */}
           <p
-            className="text-2xl sm:text-3xl font-semibold mb-4 animate-fade-up bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent"
+            className="text-2xl sm:text-3xl font-semibold mb-4 animate-fade-up text-primary"
             style={{ animationDelay: "150ms" }}
           >
             发现效率工具 · 记录成长轨迹

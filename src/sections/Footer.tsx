@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import LogoIcon from "@/components/LogoIcon";
 import { FileText, Wrench, AppWindow, User, ArrowUpRight, Shield } from "lucide-react";
 
 export default function Footer() {
@@ -8,9 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           <div className="md:col-span-5">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center text-white text-sm font-bold">
-                龟
-              </div>
+              <LogoIcon size={32} />
               <h3 className="text-lg font-bold text-foreground">龟兔算法</h3>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">

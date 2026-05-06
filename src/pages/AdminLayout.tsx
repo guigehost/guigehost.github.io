@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
+import LogoIcon from "@/components/LogoIcon";
 import {
   LayoutDashboard,
   FileText,
   AppWindow,
   LogOut,
   ArrowLeft,
-  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -48,8 +48,8 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className="w-full md:w-56 bg-primary text-primary-foreground shrink-0">
         <div className="p-4 border-b border-primary-foreground/10">
-          <Link to="/" className="flex items-center gap-2 text-lg font-bold">
-            <ArrowRight size={20} />
+          <Link to="/" className="flex items-center gap-2.5 text-lg font-bold">
+            <LogoIcon size={28} />
             龟兔算法
           </Link>
         </div>

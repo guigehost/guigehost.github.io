@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import LogoIcon from "@/components/LogoIcon";
 import {
   Menu,
   Sun,
@@ -66,10 +67,8 @@ export default function Header() {
         <div className="flex items-center justify-between h-[68px]">
           {/* Brand */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-primary/20 group-hover:shadow-primary/30 transition-shadow">
-              龟
-            </div>
-            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <LogoIcon size={32} className="group-hover:shadow-primary/40" />
+            <span className="text-xl font-bold tracking-tight text-foreground">
               龟兔算法
             </span>
           </Link>
