@@ -5,6 +5,13 @@ import { trpc } from "@/providers/trpc";
 
 export default function Footer() {
   const { data: links } = trpc.link.list.useQuery({ activeOnly: true });
+  const { data: settings } = trpc.setting.list.useQuery();
+
+  const siteTitle = settings?.siteTitle || "龟兔算法";
+  const siteAuthor = settings?.siteAuthor || "光影876";
+  const icpBeian = settings?.icpBeian || "苏ICP备2025160633号-1";
+  const gonganBeian = settings?.gonganBeian || "苏公网安备32070602010179号";
+
   return (
     <footer className="bg-muted/30 border-t border-border mt-20">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-16">
@@ -12,7 +19,7 @@ export default function Footer() {
           <div className="md:col-span-5">
             <div className="flex items-center gap-2.5 mb-4">
               <LogoIcon size={32} />
-              <h3 className="text-lg font-bold text-foreground">龟兔算法</h3>
+              <h3 className="text-lg font-bold text-foreground">{siteTitle}</h3>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               发现效率工具，记录成长轨迹。一个非技术奶爸的数字花园，专门帮你挖掘那些能让生活更轻松的宝藏工具。
@@ -87,12 +94,12 @@ export default function Footer() {
       <div className="border-t border-border/60 bg-muted/20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-center gap-2 text-xs text-muted-foreground">
-              <p>©2025 - 2026 By <span className="font-medium">光影876</span> · 龟兔算法</p>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <p>©2025 - 2026 By <span className="font-medium">{siteAuthor}</span> · {siteTitle}</p>
               <span className="hidden sm:inline text-border">|</span>
               <p className="flex items-center gap-1.5">
                 <Shield size={11} />
-                本站内容仅供学习交流
+                <a href={`mailto:${settings?.contactEmail}`} className="hover:text-primary transition-colors">{settings?.contactEmail}</a>
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs text-muted-foreground/70">
@@ -102,7 +109,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors"
               >
-                苏ICP备2025160633号-1
+                {icpBeian}
               </a>
               <span className="text-border">|</span>
               <a
@@ -111,7 +118,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors"
               >
-                苏公网安备32070602010179号
+                {gonganBeian}
               </a>
             </div>
           </div>
