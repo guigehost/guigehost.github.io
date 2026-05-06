@@ -27,6 +27,11 @@ export default function Home() {
     pageSize: 4,
   });
   const { data: onlineToolsData } = trpc.onlineTool.list.useQuery();
+  const { data: settings } = trpc.setting.list.useQuery();
+
+  const heroTitle = settings?.heroTitle || "龟兔算法";
+  const heroSubtitle = settings?.heroSubtitle || "发现效率工具 · 记录成长轨迹";
+  const siteDescription = settings?.siteDescription || "一个非技术奶爸的数字花园。帮你挖掘让工作事半功倍的好工具，也分享育儿路上的实用经验与认知收获。";
 
   return (
     <div>
@@ -61,7 +66,7 @@ export default function Home() {
 
           {/* Main title */}
           <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 animate-fade-up text-foreground drop-shadow-sm">
-            龟兔算法
+            {heroTitle}
           </h1>
 
           {/* Value proposition */}
@@ -69,7 +74,7 @@ export default function Home() {
             className="text-2xl sm:text-3xl font-semibold mb-4 animate-fade-up text-primary"
             style={{ animationDelay: "150ms" }}
           >
-            发现效率工具 · 记录成长轨迹
+            {heroSubtitle}
           </p>
 
           {/* Description */}
@@ -77,11 +82,7 @@ export default function Home() {
             className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed animate-fade-up"
             style={{ animationDelay: "300ms" }}
           >
-            一个非技术奶爸的数字花园。帮你
-            <span className="text-foreground font-medium">挖掘让工作事半功倍的宝藏工具</span>
-            ，也分享
-            <span className="text-foreground font-medium">育儿路上的实用经验与认知收获</span>
-            。
+            {siteDescription}
           </p>
 
           {/* Stats bar */}
@@ -103,7 +104,7 @@ export default function Home() {
             </span>
             <span className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
-                <Compass size={15} className="text-amber-600 dark:text-amber-400" />
+                <Compass size={15} className="text-amber-600 dark:text-amber-600" />
               </div>
               自研在线工具
             </span>
