@@ -207,6 +207,17 @@ async function seed() {
   }
 
   // --- Online Tools ---
+  const onlineToolData = [
+    {
+      name: "兔填填",
+      slug: "tutiantian",
+      description: "Word模板填充工具，上传模板自动填充数据",
+      icon: "FileText",
+      route: "/apps/tutiantian",
+      isActive: true,
+      sortOrder: 10,
+    },
+  ];
 
   for (const ot of onlineToolData) {
     const existing = await db.query.onlineTools.findFirst({ where: eq(onlineTools.slug, ot.slug) });
