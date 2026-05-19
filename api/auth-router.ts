@@ -362,6 +362,116 @@ export const authRouter = createRouter({
       return { success: true, newBalance: result.newBalance };
     }),
 
+  // --- Get point packages ---
+  listPointPackages: publicQuery.query(async () => {
+    const db = getDb();
+    const packages = await db.query.pointPackages.findMany({
+      where: eq(schema.pointPackages.status, "active"),
+      orderBy: (pkg, { asc }) => [asc(pkg.sortOrder)],
+    });
+    return packages;
+  }),
+
+  // --- Create recharge order ---
+  createRechargeOrder: authedQuery
+    .input(z.object({ packageId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+
+      const pkg = await db.query.pointPackages.findFirst({
+        where: eq(schema.pointPackages.id, input.packageId),
+      });
+      if (!pkg || pkg.status !== "active") {
+        throw new TRPCError({ code: "NOT_FOUND", message: "套餐不存在" });
+      }
+
+      const orderNo = `TP${crypto.randomUUID().replace(/-/g, "").substring(0, 12).toUpperCase()}`;
+      const user = ctx.user;
+
+      await db.insert(schema.pointOrders).values({
+        userId: user.id,
+        orderNo,
+        packageId: pkg.id,
+        points: pkg.points,
+        price: pkg.price,
+        paymentStatus: "pending",
+      });
+
+      return {
+        success: true,
+        orderNo,
+        message: "请使用微信扫描下方收款码转账，转账时备注您的邮箱以便核实",
+        qrCodeUrl: "/assets/wechat_qr.jpg",
+        contact: {
+          wechat: "openclaw876",
+          email: "guige20231@outlook.com",
+        },
+        package: {
+          name: pkg.name,
+          points: pkg.points,
+          price: pkg.price,
+        },
+      };
+    }),
+
+  // --- Get recharge orders ---
+  getRechargeOrders: authedQuery.query(async ({ ctx }) => {
+    const db = getDb();
+    const orders = await db.query.pointOrders.findMany({
+      where: eq(schema.pointOrders.userId, ctx.user.id),
+      orderBy: (o, { desc }) => [desc(o.createdAt)],
+      limit: 20,
+    });
+    return orders;
+  }),
+
+  // --- Confirm recharge (self-confirm for semi-auto) ---
+  confirmRecharge: authedQuery
+    .input(z.object({ orderNo: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      const user = ctx.user;
+
+      const order = await db.query.pointOrders.findFirst({
+        where: eq(schema.pointOrders.orderNo, input.orderNo),
+      });
+
+      if (!order) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "订单不存在" });
+      }
+
+      if (order.userId !== user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "无权操作此订单" });
+      }
+
+      if (order.paymentStatus === "paid") {
+        throw new TRPCError({ code: "CONFLICT", message: "订单已支付" });
+      }
+
+      const pkg = await db.query.pointPackages.findFirst({
+        where: eq(schema.pointPackages.id, order.packageId!),
+      });
+
+      await db
+        .update(schema.pointOrders)
+        .set({ paymentStatus: "paid", paidAt: new Date() })
+        .where(eq(schema.pointOrders.orderNo, input.orderNo));
+
+      const newBalance = await addTuPoints(user.id, order.points);
+
+      await createPointLog({
+        userId: user.id,
+        action: "purchase",
+        changeAmount: order.points,
+        balanceBefore: user.tuPoints,
+        balanceAfter: newBalance,
+        description: `充值${order.points}兔点，购买${pkg?.name || "套餐"}`,
+        relatedOrder: input.orderNo,
+      });
+
+      return { success: true, newBalance };
+    }),
+
   logout: authedQuery.mutation(async ({ ctx }) => {
     const opts = getSessionCookieOptions(ctx.req.headers);
     ctx.resHeaders.append(

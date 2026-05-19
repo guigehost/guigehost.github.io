@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Coins, Calendar, History, Gift, ArrowRight } from "lucide-react";
+import { Coins, Calendar, History, Gift, ArrowRight, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/providers/trpc";
 
@@ -12,12 +11,23 @@ export default function UserCenter() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [checkingIn, setCheckingIn] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
+  const [currentOrder, setCurrentOrder] = useState<any>(null);
+  const [creatingOrder, setCreatingOrder] = useState(false);
 
   const { data: checkinStatus, refetch: refetchCheckin } = trpc.auth.getCheckinStatus.useQuery(undefined, {
     enabled: !!isAuthenticated,
   });
 
-  const { data: balanceData } = trpc.auth.getBalance.useQuery(undefined, {
+  const { data: balanceData, refetch: refetchBalance } = trpc.auth.getBalance.useQuery(undefined, {
+    enabled: !!isAuthenticated,
+  });
+
+  const { data: packagesData, refetch: refetchPackages } = trpc.auth.listPointPackages.useQuery(undefined, {
+    enabled: !!isAuthenticated,
+  });
+
+  const { data: ordersData, refetch: refetchOrders } = trpc.auth.getRechargeOrders.useQuery(undefined, {
     enabled: !!isAuthenticated,
   });
 
@@ -26,10 +36,35 @@ export default function UserCenter() {
       alert(`签到成功！获得 ${data.pointsEarned} 兔点`);
       setCheckingIn(false);
       refetchCheckin();
+      refetchBalance();
     },
     onError: (err) => {
       alert(err.message);
       setCheckingIn(false);
+    },
+  });
+
+  const createOrderMutation = trpc.auth.createRechargeOrder.useMutation({
+    onSuccess: (data) => {
+      setCurrentOrder(data);
+      setCreatingOrder(false);
+    },
+    onError: (err) => {
+      alert(err.message);
+      setCreatingOrder(false);
+    },
+  });
+
+  const confirmOrderMutation = trpc.auth.confirmRecharge.useMutation({
+    onSuccess: (data) => {
+      alert(`充值成功！获得 ${currentOrder.package.points} 兔点`);
+      setCurrentOrder(null);
+      setSelectedPackage(null);
+      refetchOrders();
+      refetchBalance();
+    },
+    onError: (err) => {
+      alert(err.message);
     },
   });
 
@@ -53,6 +88,20 @@ export default function UserCenter() {
     setCheckingIn(true);
     checkinMutation.mutate();
   };
+
+  const handleSelectPackage = (packageId: number) => {
+    setSelectedPackage(packageId);
+    setCreatingOrder(true);
+    createOrderMutation.mutate({ packageId });
+  };
+
+  const handleConfirmPayment = () => {
+    if (currentOrder) {
+      confirmOrderMutation.mutate({ orderNo: currentOrder.orderNo });
+    }
+  };
+
+  const packages = packagesData || [];
 
   return (
     <div className="max-w-4xl mx-auto px-5 py-12">
@@ -150,29 +199,159 @@ export default function UserCenter() {
           </div>
 
           <TabsContent value="record" className="p-6">
-            <div className="text-center py-8 text-muted-foreground">
-              <p>暂无记录</p>
-            </div>
+            {ordersData && ordersData.length > 0 ? (
+              <div className="space-y-3">
+                {ordersData.map((order: any) => (
+                  <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-muted/50">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${order.paymentStatus === "paid" ? "bg-green-500/10" : "bg-yellow-500/10"}`}>
+                        {order.paymentStatus === "paid" ? (
+                          <CheckCircle size={20} className="text-green-600" />
+                        ) : (
+                          <Clock size={20} className="text-yellow-600" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium">{order.points} 兔点</p>
+                        <p className="text-sm text-muted-foreground">
+                          {order.paymentStatus === "paid" ? "已充值" : "待支付"} · {new Date(order.createdAt).toLocaleDateString("zh-CN")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-lg">¥{order.price}</p>
+                      {order.paymentStatus === "paid" && (
+                        <p className="text-sm text-green-600">已完成</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Coins size={48} className="mx-auto mb-4 opacity-30" />
+                <p>暂无充值记录</p>
+                <p className="text-sm mt-2">签到可以获得兔点哦</p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="recharge" className="p-6">
-            <p className="text-center text-muted-foreground mb-6">充值功能开发中，敬请期待...</p>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { points: 100, price: "6" },
-                { points: 500, price: "28" },
-                { points: 1000, price: "50" },
-              ].map((pkg) => (
-                <div
-                  key={pkg.points}
-                  className="border rounded-2xl p-4 text-center hover:border-primary/50 transition-colors cursor-pointer"
-                >
-                  <Coins size={24} className="mx-auto mb-2 text-primary" />
-                  <p className="font-bold text-lg">{pkg.points} 兔点</p>
-                  <p className="text-muted-foreground">¥{pkg.price}</p>
+            {currentOrder ? (
+              /* Order Detail / Payment Instructions */
+              <div className="text-center">
+                <div className="mb-6">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <Gift size={32} className="text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">订单已创建</h3>
+                  <p className="text-muted-foreground">订单号: {currentOrder.orderNo}</p>
                 </div>
-              ))}
-            </div>
+
+                <Card className="mb-6 bg-muted/50">
+                  <CardContent className="pt-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-muted-foreground">充值套餐</span>
+                      <span className="font-bold">{currentOrder.package.name}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-muted-foreground">获得兔点</span>
+                      <span className="font-bold text-primary">{currentOrder.package.points} 兔点</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">支付金额</span>
+                      <span className="font-bold text-xl">¥{currentOrder.package.price}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 text-left">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle size={20} className="text-yellow-600 mt-0.5" />
+                    <div className="text-sm text-yellow-800">
+                      <p className="font-medium mb-2">付款说明：</p>
+                      <p className="mb-1">1. 使用微信扫描下方收款码</p>
+                      <p className="mb-1">2. 转账时备注您的邮箱: {user?.email}</p>
+                      <p className="mb-1">3. 转账完成后点击"确认充值"按钮</p>
+                      <p>4. 客服核实后会自动到账（预计1小时内）</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <img
+                    src="https://guige.host/wechat_qr.jpg"
+                    alt="微信收款码"
+                    className="w-48 h-48 mx-auto rounded-xl border-2 border-border"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">微信收款码</p>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <Button
+                    onClick={handleConfirmPayment}
+                    disabled={confirmOrderMutation.isPending}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {confirmOrderMutation.isPending ? "处理中..." : "我已转账，确认充值"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setCurrentOrder(null);
+                      setSelectedPackage(null);
+                    }}
+                  >
+                    取消
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              /* Package Selection */
+              <>
+                <p className="text-center text-muted-foreground mb-6">
+                  选择充值套餐，付款后兔点自动到账
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {packages.map((pkg: any, index: number) => (
+                    <div
+                      key={pkg.id}
+                      onClick={() => handleSelectPackage(pkg.id)}
+                      className={`relative border-2 rounded-2xl p-6 text-center cursor-pointer transition-all hover:border-primary/50 ${
+                        pkg.isFeatured ? "border-primary shadow-md" : "border-border"
+                      }`}
+                    >
+                      {pkg.isFeatured && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-xs px-3 py-1 rounded-full">
+                          推荐
+                        </div>
+                      )}
+                      <Coins size={32} className="mx-auto mb-3 text-primary" />
+                      <p className="font-bold text-xl mb-1">{pkg.points} 兔点</p>
+                      <p className="text-2xl font-bold text-primary mb-2">¥{pkg.price}</p>
+                      <p className="text-sm text-muted-foreground">
+                        ≈ {pkg.price / pkg.points > 0 ? (pkg.price / pkg.points * 10).toFixed(1) : "0"} 分/兔点
+                      </p>
+                      {creatingOrder && selectedPackage === pkg.id && (
+                        <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-2xl">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8 p-4 bg-muted/50 rounded-xl">
+                  <h4 className="font-medium mb-2">充值说明</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• 付款后预计1小时内到账</li>
+                    <li>• 转账时务必备注邮箱以便核实</li>
+                    <li>• 如有疑问请联系客服</li>
+                  </ul>
+                </div>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </Card>
