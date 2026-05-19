@@ -1,12 +1,10 @@
 import { useParams, Navigate } from "react-router";
 import { trpc } from "@/providers/trpc";
 import { Skeleton } from "@/components/ui/skeleton";
-import Duanju from "./Duanju";
 
 // Tool registry - maps slug to component
 // When adding a new tool page, register it here
 const toolComponents: Record<string, React.FC> = {
-  duanju: Duanju,
 };
 
 export default function AppTool() {

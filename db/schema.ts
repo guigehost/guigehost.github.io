@@ -150,3 +150,75 @@ export const settings = mysqlTable("settings", {
 
 export type Setting = typeof settings.$inferSelect;
 export type InsertSetting = typeof settings.$inferInsert;
+
+// --- Tutiantian Tables (shared MySQL database) ---
+
+// Packages (subscription plans for 兔填填)
+export const packages = mysqlTable("packages", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  billingType: varchar("billing_type", { length: 20 }).default("quota"),
+  quota: int("quota").default(0),
+  price: varchar("price", { length: 20 }).default("0"),
+  periodDays: int("period_days"),
+  maxTemplates: int("max_templates").default(10),
+  maxFileSize: int("max_file_size").default(10485760),
+  isFeatured: boolean("is_featured").default(false),
+  sortOrder: int("sort_order").default(0),
+  status: varchar("status", { length: 20 }).default("active"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Package = typeof packages.$inferSelect;
+
+// User balances (兔填填 user balance)
+export const userBalances = mysqlTable("user_balances", {
+  id: serial("id").primaryKey(),
+  userId: bigint("user_id", { mode: "number", unsigned: true }).notNull().unique(),
+  balance: int("balance").default(0),
+  purchasedBalance: int("purchased_balance").default(0),
+  totalUsage: int("total_usage").default(0),
+  isNewUser: boolean("is_new_user").default(true),
+  emailVerified: boolean("email_verified").default(false),
+  emailCode: varchar("email_code", { length: 20 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type UserBalance = typeof userBalances.$inferSelect;
+
+// Orders (兔填填 orders)
+export const tutiantianOrders = mysqlTable("orders", {
+  id: serial("id").primaryKey(),
+  userId: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
+  packageId: bigint("package_id", { mode: "number", unsigned: true }).notNull(),
+  orderNo: varchar("order_no", { length: 64 }).notNull().unique(),
+  price: varchar("price", { length: 20 }).default("0"),
+  paymentStatus: varchar("payment_status", { length: 20 }).default("pending"),
+  paymentMethod: varchar("payment_method", { length: 20 }),
+  paidAt: timestamp("paid_at"),
+  wechatTransactionId: varchar("wechat_transaction_id", { length: 100 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type TutiantianOrder = typeof tutiantianOrders.$inferSelect;
+
+// Usage logs (兔填填 usage records)
+export const usageLogs = mysqlTable("usage_logs", {
+  id: serial("id").primaryKey(),
+  userId: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
+  action: varchar("action", { length: 50 }).notNull(),
+  changeAmount: int("change_amount").default(0),
+  balanceBefore: int("balance_before").default(0),
+  balanceAfter: int("balance_after").default(0),
+  description: varchar("description", { length: 255 }),
+  relatedOrder: varchar("related_order", { length: 64 }),
+  templateId: int("template_id"),
+  taskId: varchar("task_id", { length: 64 }),
+  status: varchar("status", { length: 20 }).default("success"),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type UsageLog = typeof usageLogs.$inferSelect;

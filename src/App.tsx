@@ -6,7 +6,6 @@ import Blog from "./pages/Blog";
 import ArticleDetail from "./pages/ArticleDetail";
 import Tools from "./pages/Tools";
 import Apps from "./pages/Apps";
-import Duanju from "./pages/Duanju";
 import AppTool from "./pages/AppTool";
 import About from "./pages/About";
 import Login from "./pages/Login";
@@ -18,6 +17,7 @@ import AdminArticleEdit from "./pages/AdminArticleEdit";
 import AdminTools from "./pages/AdminTools";
 import AdminLinks from "./pages/AdminLinks";
 import AdminSettings from "./pages/AdminSettings";
+import AdminTutiantian from "./pages/AdminTutiantian";
 
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -74,14 +74,6 @@ export default function App() {
         }
       />
       <Route
-        path="/apps/duanju"
-        element={
-          <PublicLayout>
-            <Duanju />
-          </PublicLayout>
-        }
-      />
-      <Route
         path="/apps/:slug"
         element={
           <PublicLayout>
@@ -110,6 +102,7 @@ export default function App() {
         <Route path="tools" element={<AdminTools />} />
         <Route path="links" element={<AdminLinks />} />
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="tutiantian" element={<AdminTutiantian />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

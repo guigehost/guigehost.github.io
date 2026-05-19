@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   ArrowLeft,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +28,12 @@ const navGroups = [
     items: [
       { label: "友情链接", path: "/admin/links", icon: Link2 },
       { label: "网站设置", path: "/admin/settings", icon: Settings },
+    ],
+  },
+  {
+    label: "兔填填",
+    items: [
+      { label: "订单管理", path: "/admin/tutiantian", icon: Package },
     ],
   },
 ];

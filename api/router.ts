@@ -7,6 +7,7 @@ import { toolRouter } from "./routers/toolRouter";
 import { onlineToolRouter } from "./routers/onlineToolRouter";
 import { linkRouter } from "./routers/linkRouter";
 import { settingRouter } from "./routers/settingRouter";
+import { tutiantianRouter } from "./routers/tutiantianRouter";
 
 export const appRouter = createRouter({
   ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),
@@ -18,6 +19,7 @@ export const appRouter = createRouter({
   onlineTool: onlineToolRouter,
   link: linkRouter,
   setting: settingRouter,
+  tutiantian: tutiantianRouter,
 });
 
 export type AppRouter = typeof appRouter;
