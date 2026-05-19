@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import { AppWindow, ArrowRight, Plus, Code, Globe } from "lucide-react";
 import { trpc } from "@/providers/trpc";
 import AnimatedSection from "@/sections/AnimatedSection";
@@ -27,7 +26,7 @@ export default function Apps() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
         {onlineTools?.map((tool, i) => (
           <AnimatedSection key={tool.id} delay={i * 100}>
-            <Link to={tool.route} className="block h-full">
+            <a href={tool.route} className="block h-full">
               <Card className="group h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border cursor-pointer overflow-hidden">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
@@ -54,7 +53,7 @@ export default function Apps() {
                   </div>
                 </CardContent>
               </Card>
-            </Link>
+            </a>
           </AnimatedSection>
         ))}
 

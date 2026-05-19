@@ -11,7 +11,7 @@ let instance: ReturnType<typeof drizzle<typeof fullSchema>>;
 export function getDb() {
   if (!instance) {
     const pool = mysql.createPool({
-      uri: env.databaseUrl,
+      uri: env.databaseUrl + (env.databaseUrl.includes('?') ? '&charset=utf8mb4' : '?charset=utf8mb4'),
       connectionLimit: 10,
       queueLimit: 0,
       waitForConnections: true,

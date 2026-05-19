@@ -40,6 +40,12 @@ export default function AppTool() {
     return <ToolComponent />;
   }
 
+  // External tool: redirect to its route
+  if (typeof window !== "undefined" && tool.route) {
+    window.location.href = tool.route;
+    return null;
+  }
+
   // Fallback: show tool info with placeholder
   return (
     <div className="max-w-3xl mx-auto px-4 py-20 text-center">
@@ -47,7 +53,7 @@ export default function AppTool() {
       <p className="text-muted-foreground mb-6">{tool.description}</p>
       <div className="bg-muted rounded-xl p-8">
         <p className="text-muted-foreground">
-          工具页面开发中，敬请期待...
+          正在跳转到工具页面...
         </p>
         <p className="text-sm text-muted-foreground/60 mt-2">
           路径：{tool.route}
