@@ -121,6 +121,25 @@ jobs:
             echo "✅ Deployment complete!"
           REMOTE
 
+      - name: 🚀 Deploy Tutiantian Frontend
+        run: |
+          echo "=== 🚀 Deploying Tutiantian Frontend ==="
+
+          # Clone and build tutiantian frontend
+          cd /tmp
+          rm -rf tutiantian-frontend
+          git clone --depth 1 https://github.com/guigehost/tutiantian-frontend.git
+          cd tutiantian-frontend
+          cd frontend
+          npm install
+          npm run build
+
+          # Upload to server
+          echo "📤 Uploading tutiantian frontend..."
+          scp -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -P ${{ secrets.SSH_PORT || '22' }} -r dist/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/www/wwwroot/tutiantian/
+
+          echo "✅ Tutiantian frontend deployed!"
+
       - name: ✅ Health check
         run: |
           sleep 3
