@@ -207,17 +207,6 @@ async function seed() {
   }
 
   // --- Online Tools ---
-  const onlineToolData = [
-    {
-      name: "短剧搜索",
-      slug: "duanju",
-      description: "快速、安全地查找你需要的短剧，享受简洁高效的看剧体验",
-      icon: "Search",
-      route: "/apps/duanju",
-      isActive: true,
-      sortOrder: 0,
-    },
-  ];
 
   for (const ot of onlineToolData) {
     const existing = await db.query.onlineTools.findFirst({ where: eq(onlineTools.slug, ot.slug) });

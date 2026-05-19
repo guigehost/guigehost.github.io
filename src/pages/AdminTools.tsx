@@ -235,11 +235,11 @@ export default function AdminTools() {
           <div className="space-y-4 py-2">
             <div>
               <Label>名称</Label>
-              <Input value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="短剧搜索" />
+              <Input value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="工具名称" />
             </div>
             <div>
               <Label>Slug（唯一标识）</Label>
-              <Input value={formSlug} onChange={(e) => setFormSlug(e.target.value)} placeholder="duanju" />
+              <Input value={formSlug} onChange={(e) => setFormSlug(e.target.value)} placeholder="tool-slug" />
             </div>
             <div>
               <Label>描述</Label>
@@ -247,7 +247,7 @@ export default function AdminTools() {
             </div>
             <div>
               <Label>路由路径</Label>
-              <Input value={formRoute} onChange={(e) => setFormRoute(e.target.value)} placeholder="/apps/duanju" />
+              <Input value={formRoute} onChange={(e) => setFormRoute(e.target.value)} placeholder="/apps/tool-name" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
