@@ -129,10 +129,9 @@ jobs:
           cd /tmp
           rm -rf tutiantian-frontend
           git clone --depth 1 https://github.com/guigehost/tutiantian-frontend.git
-          cd tutiantian-frontend
-          cd frontend
+          cd tutiantian-frontend/frontend
           npm install
-          npm run build
+          npx vite build
 
           # Upload to server
           echo "📤 Uploading tutiantian frontend..."
