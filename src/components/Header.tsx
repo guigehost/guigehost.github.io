@@ -13,7 +13,7 @@ import {
   FileText,
   Wrench,
   User,
-  Coinss,
+  Coins,
 } from "lucide-react";
 
 const navLinks = [
