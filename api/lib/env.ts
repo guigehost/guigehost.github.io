@@ -12,4 +12,13 @@ export const env = {
   isProduction: process.env.NODE_ENV === "production",
   databaseUrl: required("DATABASE_URL"),
   sessionSecret: required("SESSION_SECRET"),
+  // SMTP
+  smtpHost: process.env.SMTP_HOST ?? "smtp.qq.com",
+  smtpPort: parseInt(process.env.SMTP_PORT ?? "587"),
+  smtpUser: process.env.SMTP_USER ?? "",
+  smtpPass: process.env.SMTP_PASS ?? "",
+  smtpFrom: process.env.SMTP_FROM ?? "鬼哥工具箱 <noreply@guige.host>",
+  // App
+  registrationBonus: parseInt(process.env.REGISTRATION_BONUS ?? "100"),
+  checkinBonus: parseInt(process.env.CHECKIN_BONUS ?? "10"),
 };

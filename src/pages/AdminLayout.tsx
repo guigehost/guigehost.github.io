@@ -11,14 +11,29 @@ import {
   LogOut,
   ArrowLeft,
   Package,
+  Users,
+  Coins,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navGroups = [
   {
-    label: "内容管理",
+    label: "数据统计",
     items: [
       { label: "仪表盘", path: "/admin", icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: "用户管理",
+    items: [
+      { label: "用户列表", path: "/admin/users", icon: Users },
+      { label: "兔点套餐", path: "/admin/packages", icon: Coins },
+      { label: "兔点订单", path: "/admin/orders", icon: Package },
+    ],
+  },
+  {
+    label: "内容管理",
+    items: [
       { label: "文章管理", path: "/admin/articles", icon: FileText },
       { label: "在线工具", path: "/admin/tools", icon: AppWindow },
     ],
@@ -28,12 +43,6 @@ const navGroups = [
     items: [
       { label: "友情链接", path: "/admin/links", icon: Link2 },
       { label: "网站设置", path: "/admin/settings", icon: Settings },
-    ],
-  },
-  {
-    label: "兔填填",
-    items: [
-      { label: "订单管理", path: "/admin/tutiantian", icon: Package },
     ],
   },
 ];
@@ -82,7 +91,9 @@ export default function AdminLayout() {
               </p>
               <div className="space-y-0.5">
                 {group.items.map((item) => {
-                  const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+                  const active =
+                    location.pathname === item.path ||
+                    location.pathname.startsWith(item.path + "/");
                   return (
                     <Link
                       key={item.path}

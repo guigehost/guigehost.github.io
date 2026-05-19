@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { trpc } from "@/providers/trpc";
 import LogoIcon from "@/components/LogoIcon";
 import {
   Menu,
@@ -11,26 +12,28 @@ import {
   Home,
   FileText,
   Wrench,
-  AppWindow,
   User,
+  Coinss,
 } from "lucide-react";
 
 const navLinks = [
   { label: "首页", path: "/", icon: Home },
   { label: "文章", path: "/blog", icon: FileText },
-  { label: "工具推荐", path: "/tools", icon: Wrench },
-  { label: "在线工具", path: "/apps", icon: AppWindow },
-  { label: "关于", path: "/about", icon: User },
+  { label: "工具", path: "/tools", icon: Wrench },
 ];
 
 export default function Header() {
   const location = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     if (typeof window === "undefined") return false;
     return document.documentElement.classList.contains("dark");
+  });
+
+  const { data: balanceData } = trpc.auth.getBalance.useQuery(undefined, {
+    enabled: !!isAuthenticated,
   });
 
   useEffect(() => {
@@ -89,7 +92,7 @@ export default function Header() {
                 >
                   {link.label}
                   {active && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-500" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
                   )}
                 </Link>
               );
@@ -108,6 +111,22 @@ export default function Header() {
 
             {isAuthenticated && user ? (
               <div className="hidden md:flex items-center gap-2 ml-1">
+                {/* User points badge */}
+                <Link to="/user">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors">
+                    <Coins size={14} />
+                    <span>{balanceData?.tuPoints ?? user.tuPoints ?? 0}</span>
+                  </div>
+                </Link>
+
+                {/* User dropdown */}
+                <Link to="/user">
+                  <Button variant="ghost" size="sm" className="rounded-xl gap-2">
+                    <User size={16} />
+                    {user.name || user.email?.split("@")[0]}
+                  </Button>
+                </Link>
+
                 {user.role === "admin" && (
                   <Link to="/admin">
                     <Button variant="ghost" size="sm" className="rounded-xl">
@@ -115,6 +134,23 @@ export default function Header() {
                     </Button>
                   </Link>
                 )}
+              </div>
+            ) : !isLoading ? (
+              <div className="hidden md:flex items-center gap-2 ml-1">
+                <Link to="/login">
+                  <Button variant="ghost" size="sm" className="rounded-xl">
+                    登录
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button
+                    size="sm"
+                    className="rounded-xl gradient-primary text-white border-none"
+                    style={{ boxShadow: "0 2px 8px rgba(102,126,234,0.3)" }}
+                  >
+                    注册
+                  </Button>
+                </Link>
               </div>
             ) : null}
 
@@ -144,16 +180,55 @@ export default function Header() {
                       </Link>
                     );
                   })}
+
                   <div className="border-t border-border my-3" />
-                  {isAuthenticated && user?.role === "admin" && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-medium text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-                    >
-                      <AppWindow size={18} />
-                      管理后台
-                    </Link>
+
+                  {isAuthenticated && user ? (
+                    <>
+                      <Link
+                        to="/user"
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-medium text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                      >
+                        <User size={18} />
+                        个人中心
+                      </Link>
+                      <Link
+                        to="/user"
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-medium text-primary hover:bg-primary/10"
+                      >
+                        <Coins size={18} />
+                        {balanceData?.tuPoints ?? user.tuPoints ?? 0} 兔点
+                      </Link>
+                      {user.role === "admin" && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setMobileOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-medium text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                        >
+                          管理后台
+                        </Link>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/login"
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-medium text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                      >
+                        <User size={18} />
+                        登录
+                      </Link>
+                      <Link
+                        to="/register"
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-medium text-primary hover:bg-primary/10"
+                      >
+                        注册（送100兔点）
+                      </Link>
+                    </>
                   )}
                 </div>
               </SheetContent>

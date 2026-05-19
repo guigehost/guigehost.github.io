@@ -9,6 +9,7 @@ import {
   boolean,
   bigint,
   primaryKey,
+  date,
 } from "drizzle-orm/mysql-core";
 
 // --- Users (local username + bcrypt password auth) ---
@@ -17,7 +18,11 @@ export const users = mysqlTable("users", {
   username: varchar("username", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 320 }),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  emailCode: varchar("email_code", { length: 6 }),
+  emailCodeExpires: timestamp("email_code_expires"),
+  tuPoints: int("tu_points").default(100).notNull(),
   avatar: text("avatar"),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -26,10 +31,44 @@ export const users = mysqlTable("users", {
     .notNull()
     .$onUpdate(() => new Date()),
   lastSignInAt: timestamp("lastSignInAt").defaultNow().notNull(),
+  registeredAt: timestamp("registered_at"),
 });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+
+// --- Checkin Logs ---
+export const checkinLogs = mysqlTable(
+  "checkin_logs",
+  {
+    id: serial("id").primaryKey(),
+    userId: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
+    checkinDate: date("checkin_date").notNull(),
+    pointsEarned: int("points_earned").default(10).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (table) => ({
+    uniqueUserDate: primaryKey({ columns: [table.userId, table.checkinDate] }),
+  })
+);
+
+export type CheckinLog = typeof checkinLogs.$inferSelect;
+
+// --- Point Logs (unified points change log) ---
+export const pointLogs = mysqlTable("point_logs", {
+  id: serial("id").primaryKey(),
+  userId: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
+  action: varchar("action", { length: 50 }).notNull(),
+  changeAmount: int("change_amount").notNull(),
+  balanceBefore: int("balance_before").notNull(),
+  balanceAfter: int("balance_after").notNull(),
+  description: varchar("description", { length: 255 }),
+  relatedOrder: varchar("related_order", { length: 64 }),
+  toolSlug: varchar("tool_slug", { length: 50 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PointLog = typeof pointLogs.$inferSelect;
 
 // --- Categories ---
 export const categories = mysqlTable("categories", {
@@ -70,6 +109,10 @@ export const articles = mysqlTable("articles", {
   publishedAt: timestamp("published_at"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  // WeChat sync
+  wechatArticleId: varchar("wechat_article_id", { length: 100 }),
+  isSynced: boolean("is_synced").default(false),
+  syncedAt: timestamp("synced_at"),
 });
 
 export type Article = typeof articles.$inferSelect;
@@ -153,7 +196,7 @@ export type InsertSetting = typeof settings.$inferInsert;
 
 // --- Tutiantian Tables (shared MySQL database) ---
 
-// Packages (subscription plans for 兔填填)
+// Packages (subscription plans for 兔填填) - DEPRECATED, use pointPackages
 export const packages = mysqlTable("packages", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
@@ -171,7 +214,42 @@ export const packages = mysqlTable("packages", {
 
 export type Package = typeof packages.$inferSelect;
 
-// User balances (兔填填 user balance)
+// Point Packages (兔点充值套餐)
+export const pointPackages = mysqlTable("point_packages", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  points: int("points").notNull(),
+  price: varchar("price", { length: 20 }).notNull(),
+  isFeatured: boolean("is_featured").default(false),
+  sortOrder: int("sort_order").default(0),
+  status: varchar("status", { length: 20 }).default("active"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PointPackage = typeof pointPackages.$inferSelect;
+
+// Point Orders (兔点充值订单)
+export const pointOrders = mysqlTable("point_orders", {
+  id: serial("id").primaryKey(),
+  userId: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
+  orderNo: varchar("order_no", { length: 64 }).notNull().unique(),
+  packageId: bigint("package_id", { mode: "number", unsigned: true }),
+  points: int("points").notNull(),
+  price: varchar("price", { length: 20 }).notNull(),
+  paymentStatus: varchar("payment_status", { length: 20 }).default("pending"),
+  paymentMethod: varchar("payment_method", { length: 20 }),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type PointOrder = typeof pointOrders.$inferSelect;
+
+// Alias for backward compat
+export { pointOrders as tutiantianOrders };
+
+// User balances (legacy - now using users.tuPoints instead)
+// Kept for backward compat with existing queries
 export const userBalances = mysqlTable("user_balances", {
   id: serial("id").primaryKey(),
   userId: bigint("user_id", { mode: "number", unsigned: true }).notNull().unique(),
@@ -179,32 +257,11 @@ export const userBalances = mysqlTable("user_balances", {
   purchasedBalance: int("purchased_balance").default(0),
   totalUsage: int("total_usage").default(0),
   isNewUser: boolean("is_new_user").default(true),
-  emailVerified: boolean("email_verified").default(false),
-  emailCode: varchar("email_code", { length: 20 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
-export type UserBalance = typeof userBalances.$inferSelect;
-
-// Orders (兔填填 orders)
-export const tutiantianOrders = mysqlTable("orders", {
-  id: serial("id").primaryKey(),
-  userId: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
-  packageId: bigint("package_id", { mode: "number", unsigned: true }).notNull(),
-  orderNo: varchar("order_no", { length: 64 }).notNull().unique(),
-  price: varchar("price", { length: 20 }).default("0"),
-  paymentStatus: varchar("payment_status", { length: 20 }).default("pending"),
-  paymentMethod: varchar("payment_method", { length: 20 }),
-  paidAt: timestamp("paid_at"),
-  wechatTransactionId: varchar("wechat_transaction_id", { length: 100 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type TutiantianOrder = typeof tutiantianOrders.$inferSelect;
-
-// Usage logs (兔填填 usage records)
+// Usage logs (兔填填 usage records) - kept for backward compat
 export const usageLogs = mysqlTable("usage_logs", {
   id: serial("id").primaryKey(),
   userId: bigint("user_id", { mode: "number", unsigned: true }).notNull(),

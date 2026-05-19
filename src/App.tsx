@@ -5,10 +5,12 @@ import Home from "./pages/Home";
 import Blog from "./pages/Blog";
 import ArticleDetail from "./pages/ArticleDetail";
 import Tools from "./pages/Tools";
-import Apps from "./pages/Apps";
 import AppTool from "./pages/AppTool";
+import ToolLanding from "./pages/ToolLanding";
 import About from "./pages/About";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import UserCenter from "./pages/UserCenter";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./pages/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -18,8 +20,21 @@ import AdminTools from "./pages/AdminTools";
 import AdminLinks from "./pages/AdminLinks";
 import AdminSettings from "./pages/AdminSettings";
 import AdminTutiantian from "./pages/AdminTutiantian";
+import AdminUsers from "./pages/AdminUsers";
+import AdminPackages from "./pages/AdminPackages";
+import AdminOrders from "./pages/AdminOrders";
 
 function PublicLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 pt-16">{children}</main>
+      <Footer />
+    </div>
+  );
+}
+
+function UserLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -66,10 +81,10 @@ export default function App() {
         }
       />
       <Route
-        path="/apps"
+        path="/tools/:slug"
         element={
           <PublicLayout>
-            <Apps />
+            <ToolLanding />
           </PublicLayout>
         }
       />
@@ -92,6 +107,17 @@ export default function App() {
 
       {/* Auth */}
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* User Center */}
+      <Route
+        path="/user"
+        element={
+          <UserLayout>
+            <UserCenter />
+          </UserLayout>
+        }
+      />
 
       {/* Admin */}
       <Route path="/admin" element={<AdminLayout />}>
@@ -103,6 +129,9 @@ export default function App() {
         <Route path="links" element={<AdminLinks />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="tutiantian" element={<AdminTutiantian />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="packages" element={<AdminPackages />} />
+        <Route path="orders" element={<AdminOrders />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
