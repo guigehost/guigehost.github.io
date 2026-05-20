@@ -39,3 +39,7 @@ build/
 # Test coverage
 coverage/
 .nyc_output/
+credentials.txt
+DEPLOY_SUMMARY.md
+testdb.cjs
+db/migrations/

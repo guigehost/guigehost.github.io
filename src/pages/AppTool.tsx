@@ -40,8 +40,9 @@ export default function AppTool() {
     return <ToolComponent />;
   }
 
-  // External tool: redirect to its route
-  if (typeof window !== "undefined" && tool.route) {
+  // External tool: redirect to its route (only for external URLs)
+  const isExternalUrl = tool.route?.startsWith("http://") || tool.route?.startsWith("https://");
+  if (typeof window !== "undefined" && tool.route && isExternalUrl) {
     window.location.href = tool.route;
     return null;
   }

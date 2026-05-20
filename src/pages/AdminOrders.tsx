@@ -7,13 +7,20 @@ export default function AdminOrders() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
-  // Placeholder data
-  const orders: any[] = [];
+  // Fetch real data via tRPC
+  const { data: ordersData, refetch } = trpc.auth.getRechargeOrders.useQuery();
+
+  // Filter orders by status
+  const orders = statusFilter === "all"
+    ? (ordersData || [])
+    : (ordersData || []).filter((o: any) => o.paymentStatus === statusFilter);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "green";
+      case "paid": return "green";
+      case "submitted": return "blue";
       case "pending": return "orange";
+      case "cancelled": return "red";
       case "refunded": return "red";
       default: return "default";
     }
@@ -21,8 +28,10 @@ export default function AdminOrders() {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "completed": return "已完成";
+      case "paid": return "已支付";
+      case "submitted": return "待确认";
       case "pending": return "待支付";
+      case "cancelled": return "已取消";
       case "refunded": return "已退款";
       default: return status;
     }

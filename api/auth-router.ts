@@ -6,7 +6,7 @@ import * as cookie from "cookie";
 import { TRPCError } from "@trpc/server";
 import { Session } from "@contracts/constants";
 import { getSessionCookieOptions } from "./lib/cookies";
-import { createRouter, authedQuery, publicQuery } from "./middleware";
+import { createRouter, authedQuery, publicQuery, adminQuery } from "./middleware";
 import {
   findUserByUsername,
   findUserByEmail,
@@ -22,6 +22,7 @@ import {
 } from "./queries/users";
 import {
   createPointLog,
+  getPointLogsByUser,
   getTodayCheckin,
   createCheckinLog,
   getCheckinStats,
@@ -330,6 +331,46 @@ export const authRouter = createRouter({
     return { tuPoints: ctx.user.tuPoints };
   }),
 
+  // --- Get point logs ---
+  getPointLogs: authedQuery.query(async ({ ctx }) => {
+    const logs = await getPointLogsByUser(ctx.user.id, 50);
+    return logs;
+  }),
+
+  // --- Get point statistics ---
+  getPointStats: authedQuery.query(async ({ ctx }) => {
+    const db = getDb();
+    const userId = ctx.user.id;
+
+    // Get all point logs for statistics
+    const logs = await getPointLogsByUser(userId, 100);
+
+    let totalAcquired = 0;
+    let totalConsumed = 0;
+    const acquisitionBySource: Record<string, number> = {};
+    const consumptionByTool: Record<string, number> = {};
+
+    for (const log of logs) {
+      if (log.changeAmount > 0) {
+        totalAcquired += log.changeAmount;
+        const source = log.action || "other";
+        acquisitionBySource[source] = (acquisitionBySource[source] || 0) + log.changeAmount;
+      } else {
+        totalConsumed += Math.abs(log.changeAmount);
+        const tool = log.toolSlug || "other";
+        consumptionByTool[tool] = (consumptionByTool[tool] || 0) + Math.abs(log.changeAmount);
+      }
+    }
+
+    return {
+      totalAcquired,
+      totalConsumed,
+      currentBalance: ctx.user.tuPoints,
+      acquisitionBySource,
+      consumptionByTool,
+    };
+  }),
+
   // --- Consume points (for tools) ---
   consumePoints: authedQuery
     .input(
@@ -425,8 +466,8 @@ export const authRouter = createRouter({
     return orders;
   }),
 
-  // --- Confirm recharge (self-confirm for semi-auto) ---
-  confirmRecharge: authedQuery
+  // --- Submit recharge payment notification (user claims to have paid) ---
+  submitRecharge: authedQuery
     .input(z.object({ orderNo: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
@@ -448,28 +489,135 @@ export const authRouter = createRouter({
         throw new TRPCError({ code: "CONFLICT", message: "订单已支付" });
       }
 
+      if (order.paymentStatus === "submitted") {
+        throw new TRPCError({ code: "CONFLICT", message: "已提交转账证明，请等待管理员确认" });
+      }
+
+      // Mark as submitted - admin will verify and confirm
+      await db
+        .update(schema.pointOrders)
+        .set({ paymentStatus: "submitted" })
+        .where(eq(schema.pointOrders.orderNo, input.orderNo));
+
+      return { success: true, message: "已提交转账证明，请等待管理员确认，兔点将在核实后到账" };
+    }),
+
+  // --- Cancel recharge order (user cancels their own pending order) ---
+  cancelRecharge: authedQuery
+    .input(z.object({ orderNo: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      const user = ctx.user;
+
+      const order = await db.query.pointOrders.findFirst({
+        where: eq(schema.pointOrders.orderNo, input.orderNo),
+      });
+
+      if (!order) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "订单不存在" });
+      }
+
+      if (order.userId !== user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "无权操作此订单" });
+      }
+
+      if (order.paymentStatus === "paid") {
+        throw new TRPCError({ code: "CONFLICT", message: "订单已支付，无法取消" });
+      }
+
+      if (order.paymentStatus === "cancelled") {
+        throw new TRPCError({ code: "CONFLICT", message: "订单已取消" });
+      }
+
+      // Mark as cancelled
+      await db
+        .update(schema.pointOrders)
+        .set({ paymentStatus: "cancelled" })
+        .where(eq(schema.pointOrders.orderNo, input.orderNo));
+
+      return { success: true, message: "订单已取消" };
+    }),
+
+
+  // --- Admin confirm recharge (credits points after verification) ---
+  adminConfirmRecharge: adminQuery
+    .input(z.object({ orderNo: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+
+      const order = await db.query.pointOrders.findFirst({
+        where: eq(schema.pointOrders.orderNo, input.orderNo),
+      });
+
+      if (!order) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "订单不存在" });
+      }
+
+      if (order.paymentStatus === "paid") {
+        throw new TRPCError({ code: "CONFLICT", message: "订单已支付" });
+      }
+
       const pkg = await db.query.pointPackages.findFirst({
         where: eq(schema.pointPackages.id, order.packageId!),
       });
 
+      // Get user for balance update
+      const userResult = await db.query.users.findFirst({
+        where: eq(schema.users.id, order.userId),
+      });
+
+      if (!userResult) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "用户不存在" });
+      }
+
+      // Update order status
       await db
         .update(schema.pointOrders)
         .set({ paymentStatus: "paid", paidAt: new Date() })
         .where(eq(schema.pointOrders.orderNo, input.orderNo));
 
-      const newBalance = await addTuPoints(user.id, order.points);
+      // Add points to user
+      const newBalance = await addTuPoints(order.userId, order.points);
 
+      // Create point log
       await createPointLog({
-        userId: user.id,
+        userId: order.userId,
         action: "purchase",
         changeAmount: order.points,
-        balanceBefore: user.tuPoints,
+        balanceBefore: userResult.tuPoints,
         balanceAfter: newBalance,
-        description: `充值${order.points}兔点，购买${pkg?.name || "套餐"}`,
+        description: `管理员确认充值${order.points}兔点，购买${pkg?.name || "套餐"}`,
         relatedOrder: input.orderNo,
       });
 
       return { success: true, newBalance };
+    }),
+
+  // --- Admin reject recharge ---
+  adminRejectRecharge: adminQuery
+    .input(z.object({ orderNo: z.string(), reason: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+
+      const order = await db.query.pointOrders.findFirst({
+        where: eq(schema.pointOrders.orderNo, input.orderNo),
+      });
+
+      if (!order) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "订单不存在" });
+      }
+
+      if (order.paymentStatus === "paid") {
+        throw new TRPCError({ code: "CONFLICT", message: "订单已支付，无法驳回" });
+      }
+
+      // Mark as cancelled
+      await db
+        .update(schema.pointOrders)
+        .set({ paymentStatus: "cancelled" })
+        .where(eq(schema.pointOrders.orderNo, input.orderNo));
+
+      return { success: true, message: "已驳回充值申请" };
     }),
 
   logout: authedQuery.mutation(async ({ ctx }) => {

@@ -21,7 +21,7 @@ export async function findArticles({
   const conditions = [];
 
   if (status !== "all") {
-    conditions.push(eq(articles.status, status));
+    conditions.push(sql`${articles.status} = ${status}`);
   }
 
   if (categorySlug) {
@@ -68,7 +68,7 @@ export async function findArticles({
     .from(articles)
     .leftJoin(categories, eq(articles.categoryId, categories.id))
     .where(whereClause)
-    .orderBy(desc(articles.publishedAt), desc(articles.createdAt))
+    .orderBy(desc(articles.createdAt))
     .limit(pageSize)
     .offset((page - 1) * pageSize);
 

@@ -14,6 +14,7 @@ import {
   Wrench,
   User,
   Coins,
+  LogOut,
 } from "lucide-react";
 
 const navLinks = [
@@ -24,7 +25,7 @@ const navLinks = [
 
 export default function Header() {
   const location = useLocation();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => {
@@ -134,6 +135,15 @@ export default function Header() {
                     </Button>
                   </Link>
                 )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-xl gap-2"
+                  onClick={logout}
+                >
+                  <LogOut size={16} />
+                  退出
+                </Button>
               </div>
             ) : !isLoading ? (
               <div className="hidden md:flex items-center gap-2 ml-1">
@@ -210,6 +220,13 @@ export default function Header() {
                           管理后台
                         </Link>
                       )}
+                      <button
+                        onClick={() => { logout(); setMobileOpen(false); }}
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-medium text-red-500 hover:bg-red-50 w-full text-left"
+                      >
+                        <LogOut size={18} />
+                        退出登录
+                      </button>
                     </>
                   ) : (
                     <>

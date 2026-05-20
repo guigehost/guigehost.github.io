@@ -121,7 +121,12 @@ export default function Tools() {
               <div className="text-4xl font-bold text-foreground mb-2">100</div>
               <div className="text-sm text-muted-foreground mb-4">兔点</div>
               <div className="text-2xl font-bold text-primary mb-1">¥6</div>
-              <div className="text-xs text-muted-foreground">首充特惠</div>
+              <div className="text-xs text-muted-foreground mb-4">首充特惠</div>
+              <Link to="/user?tab=recharge">
+                <Button variant="outline" size="sm" className="rounded-xl w-full">
+                  前往充值
+                </Button>
+              </Link>
             </CardContent>
           </Card>
           <Card className="border-border/50 text-center">
@@ -129,7 +134,12 @@ export default function Tools() {
               <div className="text-4xl font-bold text-foreground mb-2">500</div>
               <div className="text-sm text-muted-foreground mb-4">兔点</div>
               <div className="text-2xl font-bold text-primary mb-1">¥28</div>
-              <div className="text-xs text-muted-foreground">约5.6分/兔点</div>
+              <div className="text-xs text-muted-foreground mb-4">约5.6分/兔点</div>
+              <Link to="/user?tab=recharge">
+                <Button variant="outline" size="sm" className="rounded-xl w-full">
+                  前往充值
+                </Button>
+              </Link>
             </CardContent>
           </Card>
           <Card className="border-border/50 text-center relative overflow-hidden">
@@ -140,14 +150,19 @@ export default function Tools() {
               <div className="text-4xl font-bold text-foreground mb-2">1000</div>
               <div className="text-sm text-muted-foreground mb-4">兔点</div>
               <div className="text-2xl font-bold text-primary mb-1">¥50</div>
-              <div className="text-xs text-muted-foreground">约5分/兔点</div>
+              <div className="text-xs text-muted-foreground mb-4">约5分/兔点</div>
+              <Link to="/user?tab=recharge">
+                <Button size="sm" className="rounded-xl w-full">
+                  前往充值
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
         <div className="text-center">
           <Link to="/user">
             <Button variant="outline" size="lg" className="rounded-2xl">
-              前往充值
+              前往会员中心
               <ArrowRight size={18} className="ml-2" />
             </Button>
           </Link>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/providers/trpc";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
+import DOMPurify from "dompurify";
 
 export default function ArticleDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -104,7 +105,7 @@ export default function ArticleDetail() {
       {/* Content */}
       <div
         className="article-content text-foreground"
-        dangerouslySetInnerHTML={{ __html: article.content || "" }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || "", { USE_PROFILES: { html: true } }) }}
       />
 
       {/* Tags */}

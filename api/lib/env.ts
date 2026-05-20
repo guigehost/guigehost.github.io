@@ -17,7 +17,7 @@ export const env = {
   smtpPort: parseInt(process.env.SMTP_PORT ?? "587"),
   smtpUser: process.env.SMTP_USER ?? "",
   smtpPass: process.env.SMTP_PASS ?? "",
-  smtpFrom: process.env.SMTP_FROM ?? "鬼哥工具箱 <noreply@guige.host>",
+  smtpFrom: process.env.SMTP_FROM ?? "兔智AI工具箱 <noreply@guige.host>",
   // App
   registrationBonus: parseInt(process.env.REGISTRATION_BONUS ?? "100"),
   checkinBonus: parseInt(process.env.CHECKIN_BONUS ?? "10"),

@@ -32,7 +32,7 @@ export default function AdminDashboard() {
   const { data: articleData } = trpc.article.list.useQuery({
     status: "all",
     page: 1,
-    pageSize: 100,
+    pageSize: 50,
   });
   const { data: toolData } = trpc.tool.list.useQuery({ page: 1, pageSize: 1 });
   const { data: categoryData } = trpc.category.list.useQuery();

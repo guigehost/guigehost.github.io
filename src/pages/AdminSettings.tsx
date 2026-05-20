@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/providers/trpc";
+import { toast } from "sonner";
 
 const defaultSettings: Record<string, string> = {
   siteTitle: "龟兔算法",
@@ -33,7 +34,7 @@ export default function AdminSettings() {
   const setMutation = trpc.setting.bulkSet.useMutation({
     onSuccess: () => {
       utils.setting.list.invalidate();
-      alert("设置已保存");
+      toast.success("设置已保存");
     },
   });
 

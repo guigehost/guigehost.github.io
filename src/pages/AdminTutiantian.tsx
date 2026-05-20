@@ -467,13 +467,13 @@ export default function AdminTutiantian() {
                         上一页
                       </Button>
                       <span className="text-sm text-muted-foreground">
-                        第 {logPage} / {Math.ceil(logData.total / 10)} 页
+                        第 {logPage} / {Math.ceil(logsData.total / 10)} 页
                       </span>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setLogPage((p) => p + 1)}
-                        disabled={logPage >= Math.ceil(logData.total / 10)}
+                        disabled={logPage >= Math.ceil(logsData.total / 10)}
                       >
                         下一页
                       </Button>

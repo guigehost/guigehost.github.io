@@ -17,7 +17,7 @@ export function getDb() {
       waitForConnections: true,
     });
     instance = drizzle(pool, {
-      mode: "planetscale",
+      mode: "default",
       schema: fullSchema,
     });
   }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,26 +8,27 @@ import { trpc } from "@/providers/trpc";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const utils = trpc.useUtils;
+  const [error, setError] = useState("");
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
 
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: async (user) => {
-      await utils().invalidate();
+    onSuccess: (user) => {
       if (user.role === "admin") {
-        navigate("/admin");
+        window.location.href = "/admin";
       } else {
-        navigate("/");
+        window.location.href = redirect;
       }
     },
     onError: (err) => {
-      alert(err.message);
+      setError(err.message);
       setLoading(false);
     },
   });
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
     const fd = new FormData(e.currentTarget);
     loginMutation.mutate({
@@ -52,6 +53,11 @@ export default function Login() {
           </CardHeader>
           <CardContent>
             <form onSubmit={onSubmit} className="space-y-4">
+              {error && (
+                <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm text-center">
+                  {error}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="username">邮箱或用户名</Label>
                 <Input
@@ -59,7 +65,7 @@ export default function Login() {
                   name="username"
                   required
                   placeholder="输入邮箱或用户名"
-                  autoFocus
+                  autoComplete="username"
                 />
               </div>
               <div className="space-y-2">
@@ -70,6 +76,7 @@ export default function Login() {
                   type="password"
                   required
                   placeholder="输入密码"
+                  autoComplete="current-password"
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>

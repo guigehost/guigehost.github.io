@@ -13,12 +13,8 @@ export default function AdminPackages() {
     isFeatured: false,
   });
 
-  // Placeholder data
-  const packages = [
-    { id: 1, name: "100兔点", points: 100, price: "6", isFeatured: false, status: "active" },
-    { id: 2, name: "500兔点包", points: 500, price: "28", isFeatured: true, status: "active" },
-    { id: 3, name: "1000兔点包", points: 1000, price: "50", isFeatured: false, status: "active" },
-  ];
+  // Fetch real data via tRPC
+  const { data: packagesData, refetch } = trpc.auth.listPointPackages.useQuery();
 
   const handleSave = () => {
     if (!formData.name || !formData.points || !formData.price) {
@@ -60,7 +56,7 @@ export default function AdminPackages() {
 
       <Card>
         <Table
-          dataSource={packages}
+          dataSource={packagesData || []}
           rowKey="id"
           pagination={false}
           columns={[
