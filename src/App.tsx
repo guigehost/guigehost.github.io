@@ -1,3 +1,4 @@
+// Guige Host - Main App Router
 import { Routes, Route } from "react-router";
 import Header from "@/components/Header";
 import Footer from "@/sections/Footer";
