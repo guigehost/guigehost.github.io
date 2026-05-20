@@ -42,7 +42,7 @@ export default function AppTool() {
 
   // External tool: redirect to its route (only for external URLs)
   const isExternalUrl = tool.route?.startsWith("http://") || tool.route?.startsWith("https://");
-  if (typeof window !== "undefined" && tool.route && isExternalUrl) {
+  if (tool.route && isExternalUrl) {
     window.location.href = tool.route;
     return null;
   }

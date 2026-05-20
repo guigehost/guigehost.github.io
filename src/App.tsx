@@ -44,6 +44,13 @@ function UserLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function TutiantianRedirect() {
+  if (typeof window !== "undefined") {
+    window.location.href = "/apps/tutiantian/";
+  }
+  return null;
+}
+
 export default function App() {
   return (
     <Routes>
@@ -88,6 +95,8 @@ export default function App() {
           </PublicLayout>
         }
       />
+      {/* Tutiantian uses its own frontend served by Nginx alias */}
+      <Route path="/apps/tutiantian" element={<TutiantianRedirect />} />
       <Route
         path="/apps/:slug"
         element={
