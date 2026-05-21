@@ -6,22 +6,47 @@ import type { ReactNode } from "react";
 
 export const trpc = createTRPCReact<AppRouter>();
 
-const queryClient = new QueryClient();
-const trpcClient = trpc.createClient({
-  links: [
-    httpBatchLink({
-      url: "/api/trpc",
-      fetch(input, init) {
-        return globalThis.fetch(input, {
-          ...(init ?? {}),
-          credentials: "include",
-        });
+// Lazy initialization to avoid TDZ errors
+let _queryClient: QueryClient | null = null;
+let _trpcClient: ReturnType<typeof trpc.createClient> | null = null;
+
+function getQueryClient() {
+  if (!_queryClient) {
+    _queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: 1000 * 60 * 5,
+          retry: false,
+        },
       },
-    }),
-  ],
-});
+    });
+  }
+  return _queryClient;
+}
+
+function getTrpcClient() {
+  if (!_trpcClient) {
+    _trpcClient = trpc.createClient({
+      links: [
+        httpBatchLink({
+          url: "/api/trpc",
+          fetch(input, init) {
+            return globalThis.fetch(input, {
+              ...(init ?? {}),
+              credentials: "include",
+            });
+          },
+        }),
+      ],
+    });
+  }
+  return _trpcClient;
+}
 
 export function TRPCProvider({ children }: { children: ReactNode }) {
+  const queryClient = getQueryClient();
+  const trpcClient = getTrpcClient();
+
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
