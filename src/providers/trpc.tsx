@@ -6,46 +6,29 @@ import type { ReactNode } from "react";
 
 export const trpc = createTRPCReact<AppRouter>();
 
-// Lazy initialization to avoid TDZ errors
-let _queryClient: QueryClient | null = null;
-let _trpcClient: ReturnType<typeof trpc.createClient> | null = null;
-
-function getQueryClient() {
-  if (!_queryClient) {
-    _queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 1000 * 60 * 5,
-          retry: false,
-        },
-      },
-    });
-  }
-  return _queryClient;
-}
-
-function getTrpcClient() {
-  if (!_trpcClient) {
-    _trpcClient = trpc.createClient({
-      links: [
-        httpBatchLink({
-          url: "/api/trpc",
-          fetch(input, init) {
-            return globalThis.fetch(input, {
-              ...(init ?? {}),
-              credentials: "include",
-            });
-          },
-        }),
-      ],
-    });
-  }
-  return _trpcClient;
-}
-
 export function TRPCProvider({ children }: { children: ReactNode }) {
-  const queryClient = getQueryClient();
-  const trpcClient = getTrpcClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5,
+        retry: false,
+      },
+    },
+  });
+
+  const trpcClient = trpc.createClient({
+    links: [
+      httpBatchLink({
+        url: "/api/trpc",
+        fetch(input, init) {
+          return globalThis.fetch(input, {
+            ...(init ?? {}),
+            credentials: "include",
+          });
+        },
+      }),
+    ],
+  });
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
