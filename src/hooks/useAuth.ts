@@ -1,5 +1,5 @@
 import { trpc } from "@/providers/trpc";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { LOGIN_PATH } from "@/const";
 
@@ -14,6 +14,9 @@ export function useAuth(options?: UseAuthOptions) {
 
   const navigate = useNavigate();
 
+  // Defer auth check until after mount to avoid React Query v5 race conditions
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
+
   const {
     data: user,
     isLoading,
@@ -22,7 +25,13 @@ export function useAuth(options?: UseAuthOptions) {
   } = trpc.auth.me.useQuery(undefined, {
     staleTime: 1000 * 60 * 5,
     retry: false,
+    enabled: hasCheckedAuth,
   });
+
+  // Mark as checked after first mount
+  useEffect(() => {
+    setHasCheckedAuth(true);
+  }, []);
 
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
@@ -31,7 +40,6 @@ export function useAuth(options?: UseAuthOptions) {
   });
 
   const logout = useCallback(() => {
-    // Fire and forget - immediately redirect without waiting
     logoutMutation.mutate();
   }, [logoutMutation]);
 
