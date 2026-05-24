@@ -27,16 +27,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("react") || id.includes("react-router") || id.includes("react-dom")) {
-              return "react-vendor";
-            }
-            if (id.includes("@radix-ui") || id.includes("lucide-react") || id.includes("class-variance-authority") || id.includes("tailwind-merge") || id.includes("clsx")) {
-              return "ui-vendor";
-            }
-          }
-        },
+        // Disable code splitting - single bundle avoids TDZ initialization errors
+        manualChunks: undefined,
       },
     },
   },
